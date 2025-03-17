@@ -6,7 +6,7 @@
 <hr />
 <b>MGSSH</b>是一个免费的桌面式的服务器管理软件，可视化管理服务器。<br>
 直达官网：https://www.gmssh.com/<br>
-使用手册：http://doc.gmb.h6p.cn/gmssh.html<br>
+使用手册：https://docs.gmssh.com/gmssh.html<br>
 论坛地址：https://bbs.gmssh.com/<br>
 官方客服QQ：3413003425<br>
 用户技术群：367047604<br>
