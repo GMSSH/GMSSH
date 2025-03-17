@@ -4,7 +4,7 @@
 <p align="center"><strong>您的服务器管理助手</strong></p>
 <p align="center">具备精准、实时、全面可视化能力，让服务器运行状态一目了然</p>
 <hr />
-<b>MGSSH</b>是一个免费的桌面式的服务器管理软件，可视化管理服务器。<br>
+<b>GMSSH</b>是一个免费的桌面式的服务器管理软件，可视化管理服务器。<br>
 直达官网：https://www.gmssh.com/<br>
 使用手册：https://docs.gmssh.com/gmssh.html<br>
 论坛地址：https://bbs.gmssh.com/<br>
