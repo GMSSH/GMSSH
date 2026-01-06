@@ -1,33 +1,11 @@
-<div align="center"><img width="512" height="512" alt="logo1 不带圆角" src="https://github.com/user-attachments/assets/661d1cb5-a5e6-4435-8efc-338e2fb37409" />
-<br>
-<p align="center"><strong>桌面级 AI 运维系统</strong></p>
-<p align="center"><strong>高性能·零侵入·AI 智驱</strong></p>
-<p align="center">具备精准、实时、全面可视化能力，让服务器运行状态一目了然</p>
+GMSSH  Open Source
+<hr />
+<p align="center"><strong>GMSSH Desktop AI System</strong></p>
+<p align="center"><strong>High-Perf · Zero Intrusion · AI-Powered</strong></p>
+<p align="center">Reimagine operations with AI, anchor security with SSH, and evolve into an intelligent operation hub for modern infrastructure</p>
 <hr />
 <b>GMSSH 桌面级 AI 运维系统<br>
 <b>GMSSH 高性能·零侵入·AI 智驱<br>
-直达官网：https://www.gmssh.com/?ks=Github<br>
-使用手册：https://docs.gmssh.com/gmssh.html<br>
-论坛地址：https://bbs.gmssh.com/<br>
-官方客服QQ：3413003425<br>
-用户技术群：367047604<br>
-<ul>
-<li> <b>经典界面设计</b> 
-采用经典界面设计，以简洁直观的窗口、图标布局，搭配易于识别的开始菜单与任务栏，构建起人机交互友好范式。</li>
-<li><b>服务器信息监控</b> 
-实时监控服务器 CPU、内存、磁盘 I/O、网络带宽等资源使用情况，并以直观的图表形式展示。</li>
-<li><b>文件管理系统</b> 
-支持快捷上传、下载、打包、解压等操作提高数据的安全性、协作效率、数据访问效率，降低维护成本。</li>
-<li><b>防火墙安全管理</b> 
-内置防火墙功能，用户可以设置允许或禁止特定 IP 地址、端口的访问，有效防止网络攻击和恶意访问。</li>
-<li><b>运维流畅无阻</b> 
-GMSSH提供远程连接、登录、文件传输等功能，内存、CPU占用率极低，在服务器负载较高的情况下，也能优雅地运行。</li>
-<li><b>兼容主流系统</b> 
-广泛兼容 Ubuntu、CentOS、Debian 飞牛nas等主流 Linux 发行版，以及统信 UOS、麒麟等国产操作系统，全面覆盖各类服务器环境。</li>
-<li><b>集中式管理</b> 
-通过连接管理器，批量管理服务器，实现多台服务器间自由切换，提升运维效率。</li>
-<li><b>快速搭建环境</b> 
-通过可视化应用或执行简单命令，无需深入了解详细配置，即可快速完成运维环境的搭建。</li>
 
 选择适合你操作系统的安装包，<a href="https://www.gmssh.com/download">下载并安装GMSSH。</a> <br>
 
