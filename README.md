@@ -32,7 +32,7 @@ GMSSH提供远程连接、登录、文件传输等功能，内存、CPU占用率
 选择适合你操作系统的安装包，<a href="https://www.gmssh.com/download">下载并安装GMSSH。</a> <br>
 
 <h2>软件截图</h2>
-  
+
 ![desktop1](https://github.com/user-attachments/assets/a76fbc09-b795-4220-8e02-c4b0deccb132)
   
 ![desktop2](https://github.com/user-attachments/assets/103424ad-0c13-4599-b042-8fecbb6cb76e)
