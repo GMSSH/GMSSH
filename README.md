@@ -108,4 +108,6 @@ If you want your app to be listed in the **Official GMSSH App Center** (availabl
 
 ---
 *Happy Coding!*
+
 *The GMSSH Team*
+
