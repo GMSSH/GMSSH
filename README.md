@@ -28,3 +28,6 @@ GMSSH  Open Source
 
 <img width="1458" height="1154" alt="截屏2026-01-06 21 38 36" src="https://github.com/user-attachments/assets/dd43118f-73f1-4299-8403-ef07b5454f75" />
 
+<img width="2560" height="1025" alt="截屏2026-01-07 09 43 36" src="https://github.com/user-attachments/assets/8533bc53-e798-4ef5-b98a-073a113037cd" />
+
+<img width="1378" height="773" alt="截屏2026-01-07 09 44 17" src="https://github.com/user-attachments/assets/d12d8ea6-22cd-48c4-8e99-5fecc45c23bd" />
