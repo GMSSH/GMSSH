@@ -68,37 +68,37 @@ We welcome contributions in several forms:
 
 ## Developing a New App
 
-🚀 Fast Track: Jump Straight into Coding
+**🚀 Fast Track: Jump Straight into Coding**
 Want to build an app immediately? If you prefer to skip the architectural theory and start your developer journey right now, click the link below:
 
-👉 Start Your Developer Journey
+[👉 Start Your Developer Journey](https://doc-dev.gmssh.com/en/)
 
-📖 Understanding GMSSH Design Philosophy
+**📖 Understanding GMSSH Design Philosophy**
 If you prefer to grasp the underlying architecture before writing code, here is a deep dive into the core concepts:
 
-1. 🏗️ GMSSH Development Workflow
+**1. 🏗️ GMSSH Development Workflow**
 To start, one must understand the core architectural philosophy. GMSSH is far more than just a Web server—it is an intricate process orchestration system.
 
-2. 🧠 The Core Engine: ga_main
+**2. 🧠 The Core Engine: ga_main**
 Within GMSSH's topology, ga_main is the cornerstone, serving as the system's "central nervous system" and routing nexus.
 
 Distinct from LAMP: Unlike Apache/Nginx which often process business logic directly, ga_main is architected as a lightweight, high-performance microkernel.
 
-3. 🛡️ Process Isolation & Stability
+**3. 🛡️ Process Isolation & Stability**
 ga_main is fully decoupled from business logic; its sole purpose is lifecycle management and traffic dispatching. All features—from the official File Manager to custom Nginx Managers—run as isolated child processes.
 
 Sandboxed Reliability: If a third-party plugin crashes (e.g., due to memory leaks), it only terminates that single process. ga_main and other services remain unaffected.
 
 Auto-Recovery: The system actively monitors processes and handles restarts automatically.
 
-4. 🌉 Gateway & Protocol Translation
+**4. 🌉 Gateway & Protocol Translation**
 ga_main functions as the ingress gateway, aggregating all traffic from client interfaces (Electron/Web).
 
 Responsibilities: It handles Request Validation (AuthN/AuthZ), App ID resolution, and dispatching.
 
 Transparent Bridge: It seamlessly converts external HTTP/WebSocket protocols into internal IPC (Inter-Process Communication).
 
-5. ⚡ Kernel-level Data Transmission
+**5. ⚡ Kernel-level Data Transmission**
 While standard TCP/IP incurs overhead (segmentation, checksums, firewall filtering), GMSSH leverages Unix Domain Sockets (UDS) for superior performance. Data is copied directly within Kernel Memory Buffers, bypassing the network stack entirely.
 
 🚀 Zero-Copy Performance: Drastically reduces CPU context switches.
@@ -107,12 +107,12 @@ While standard TCP/IP incurs overhead (segmentation, checksums, firewall filteri
 
 🔒 Security: Relies on file system permissions. Only ga_main and the App owner can access the socket, fundamentally eliminating port scanning risks.
 
-6. 🔄 Dual-Mode Startup Support
+**6. 🔄 Dual-Mode Startup Support**
 Production (Recommended): Use UDS for maximum security and performance.
 
 Development/Debug: GMSSH supports backend services via HTTP ports, facilitating development on Windows or cross-node deployment scenarios where UDS isn't natively supported.
 
-7. 📜 JSON-RPC 2.0 Protocol
+**7. 📜 JSON-RPC 2.0 Protocol**
 At the application layer, GMSSH adopts JSON-RPC 2.0—a stateless, lightweight RPC protocol. This makes the backend language-agnostic (Python, Go, Rust, Node.js, etc.).
 
 Request Structure:
@@ -128,7 +128,6 @@ id: Unique identifier
 Response Structure:
 
 Returns execution result or an error object.
-
 
 
 ## Submitting Bugs & Features
