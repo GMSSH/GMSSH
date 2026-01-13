@@ -157,6 +157,10 @@ If you want your app to be listed in the **Official GMSSH App Center** (availabl
 2.  **Security Review:** Our team will review your code to ensure no malicious operations (e.g., stealing SSH keys).
 3.  **Approval:** Once approved, your app will be listed, and you will receive the **"GMSSH Contributor"** badge!
 
+
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=GMSSH/GMSSH&type=date&legend=top-left)](https://www.star-history.com/#GMSSH/GMSSH&type=date&legend=top-left)
 ---
 *Happy Coding!*
 
