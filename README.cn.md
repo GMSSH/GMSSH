@@ -1,4 +1,4 @@
-# 欢迎来到 GMSSH 开放生态 👋
+# 欢迎来到 GMSSH 开源生态 👋
 首先，感谢您考虑为 GMSSH 生态系统做出贡献！正是像您这样的人，让服务器管理领域变得更加高效和愉快。
 
 <img width="2560" height="1314" alt="截屏2026-01-06 21 11 55" src="https://github.com/user-attachments/assets/c454ca21-9aca-41d1-8432-5e355c407b3d" />

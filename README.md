@@ -1,4 +1,4 @@
-# Welcome to the GMSSH Open Ecosystem 👋
+# Welcome to the GMSSH Open Source Ecosystem 👋
 First off, thank you for considering contributing to the GMSSH Ecosystem! It's people like you that make the server management world more efficient and enjoyable.
 
 <img width="2560" height="1314" alt="截屏2026-01-06 21 11 55" src="https://github.com/user-attachments/assets/c454ca21-9aca-41d1-8432-5e355c407b3d" />
