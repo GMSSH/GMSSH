@@ -1,0 +1,15 @@
+logger:
+  sink: app.log
+  level: DEBUG
+  diagnose: False
+  enqueue: True,
+  rotation: "500 MB"
+  retention: "1 months"
+  compression: tar
+  format: "<green>{time:YYYYMMDD HH:mm:ss}</green> |
+    {process.name} |
+    {thread.name} |
+    <cyan>{module}</cyan>.<cyan>{function}</cyan>
+    :<cyan>{line}</cyan> |
+    <level>{level}</level>:
+    <level>{message}</level>"

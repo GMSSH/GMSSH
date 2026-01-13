@@ -1,0 +1,38 @@
+{
+    "test":{
+        "version":"1.0.0",
+        "jsonrpc":{
+            "sockets":"rpc.sock"
+        },
+        "logger":{
+            "path": "logs/",
+            "file": "{Y-m-d}.log",
+            "level": "error",
+            "stdout": false,
+            "StStatus": 0,
+            "rotateBackupLimit": 7,
+            "writerColorEnable": true,
+            "RotateBackupCompress": 9,
+            "rotateExpire": "1d",
+            "Flag": 44
+        }
+    },
+    "prod":{
+        "version":"1.0.0",
+        "jsonrpc":{
+            "sockets":"rpc.sock"
+        },
+        "logger":{
+            "path": "logs/",
+            "file": "{Y-m-d}.log",
+            "level": "error",
+            "stdout": false,
+            "StStatus": 0,
+            "rotateBackupLimit": 7,
+            "writerColorEnable": true,
+            "RotateBackupCompress": 9,
+            "rotateExpire": "1d",
+            "Flag": 44
+        }
+    }
+}
