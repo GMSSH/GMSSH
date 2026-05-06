@@ -168,7 +168,7 @@ If you need:
 <img width="2880" height="1800" alt="客户端英文版" src="https://github.com/user-attachments/assets/396513c4-e795-4e69-9234-bae463a3490b" />
 
 ### Desktop
-<img width="1440" height="775" alt="英文版" src="https://github.com/user-attachments/assets/0090af5f-0659-414b-baef-4b2ab5c64ef7" />
+<img width="2880" height="1546" alt="英文客户端在线版" src="https://github.com/user-attachments/assets/8f90f8c9-a421-4ee8-8848-e4a0a4fc00b5" />
 
 ### App Center
 <img width="1440" height="777" alt="截屏2026-05-06 18 03 44" src="https://github.com/user-attachments/assets/9591dcbe-5cd4-4316-8bfd-84d671401402" />
