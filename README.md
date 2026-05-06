@@ -1,176 +1,248 @@
-# Welcome to the GMSSH Open Source Ecosystem 👋
+<div align="center">
 
-<div>
+# GMSSH
+
+### An SSH management and server access platform for modern operations
+
+More efficient than native SSH, lighter and easier to adopt than traditional control panels.
 
 [![Chinese](https://img.shields.io/badge/Lang-%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87-brightgreen)](https://github.com/GMSSH/GMSSH/blob/main/README.cn.md)
 [![English](http://img.shields.io/badge/Lang-English-blue)](https://github.com/GMSSH/GMSSH/blob/main/README.md)
 
+<p>
+  <a href="#what-is-gmssh">Introduction</a> •
+  <a href="#why-choose-gmssh">Why GMSSH</a> •
+  <a href="#gmssh-vs-traditional-panels-and-systems">Comparison</a> •
+  <a href="#quick-start">Quick Start</a>
+</p>
+
 </div>
-
-First off, thank you for considering contributing to the GMSSH Ecosystem! It's people like you that make the server management world more efficient and enjoyable.
-
-<img width="2560" height="1314" alt="截屏2026-01-06 21 11 55" src="https://github.com/user-attachments/assets/c454ca21-9aca-41d1-8432-5e355c407b3d" />
-<table width="100%">
-  <tr>
-    <td>
-GMSSH is a Desktop AI System High-Perf  · AI-Powered tool designed for efficiency and aesthetics. 
-While our core engine remains proprietary to ensure stability, we believe in the power of community extension.
-
-## 🚀 Build for GMSSH
-
-We provide a powerful SDK that allows you to extend the capabilities of GMSSH using web technologies (HTML/JS/Vue/React) or Python/Go scripts.
-
-## ❤️Helping Open Source
-
-In addition to creating and maintaining Open Source projects, GMSSH also contributes, sponsors (both financially and via licenses) many Open Source projects. Find out more about how GMSSH helps Open Source.
-
-## 📜Code of Conduct
-This code of conduct outlines our expectations for all those who participate in our open source projects and communities (community programs), as well as the consequences for unacceptable behaviour. We invite all those who participate to help us create safe and positive experiences for everyone. Communities mirror the societies in which they exist and positive action is essential to counteract the many forms of inequality and abuses of power that exist in society.
-
-✅How to behave
-
-The following behaviours are expected and requested of all community members:
-
-Participate in an authentic and active way. In doing so, you contribute to the health and longevity of this community.
-Exercise consideration, respect and empathy in your speech and actions. Remember, we have all been through different stages of learning when adopting technologies.
-Refrain from demeaning, discriminatory, or harassing behaviour and speech.
-Disagreements on things are fine, argumentative behaviour or trolling are not.
-
-🚫How not to behave
-
-Do not perform threats of violence or use violent language directed against another person.
-Do not make jokes of sexist, racist, homophobic, transphobic, ableist or otherwise discriminatory nature, or use language of this nature.
-Do not post or display sexually explicit or violent material.
-Do not post or threaten to post other people’s personally identifying information ("doxing").
-Do not make personal insults, particularly those related to gender, sexual orientation, race, religion, or disability.
-Do not engage in sexual attention. This includes, sexualised comments or jokes and sexual advances.
-Do not advocate for, or encourage, any of the above behaviour.
-Please take into account that online communities bring together people from many different cultures and backgrounds. It's important to understand that sometimes the combination of cultural differences and online interaction can lead to misunderstandings. That is why having empathy is very important.
-
-
-Because GMSSH adopts a **"Core Proprietary + Ecosystem Open"** strategy, this guide focuses on how to contribute to the **SDK**, **Official Apps**, and **Documentation**.
-
-## Table of Contents
-1. [Code of Conduct](#code-of-conduct)
-2. [What Can I Contribute?](#what-can-i-contribute)
-3. [Developing a New App (The Workflow)](#developing-a-new-app)
-4. [Submitting Bugs & Features](#submitting-bugs--features)
-5. [Pull Request Guidelines](#pull-request-guidelines)
-6. [App Center Publishing](#app-center-publishing)
 
 ---
 
-## Code of Conduct
-By participating in this project, you agree to abide by our [Code of Conduct](LINK_TO_YOUR_CODE_OF_CONDUCT). We expect everyone to treat others with respect and empathy.
+## What is GMSSH?
 
-## What Can I Contribute?
+GMSSH is neither a traditional server control panel nor a heavyweight bastion host system designed for large organizations. It is a **lightweight SSH-native server management platform** built for developers, DevOps engineers, and small to mid-sized teams.
 
-We welcome contributions in several forms:
+If:
 
-* **🔌 New Apps/Plugins:** Build a new tool using our SDK to solve a specific operation problem (e.g., Redis GUI, Log Analyzer).
-* **🐛 Bug Fixes:** Fix issues in the `gmssh-plugin-sdk` or `gmssh-official-apps`.
-* **📝 Documentation:** Improve the SDK documentation or translate it into other languages.
-* **💡 Feature Requests:** Suggest new APIs for the SDK (e.g., "We need an API to access the local file system").
+- **Native SSH** provides the most basic connection and command-line capability
+- **Traditional panels** provide long-running visual management on the server
+- **Bastion host systems** provide centralized access control, auditing, and governance
 
-> **Note:** The core binary of GMSSH Client is closed source. Please do not reverse engineer or decompile the core logic. Focus on the JavaScript/Python/GO extension layer.
+ **GMSSH focuses on a different high-frequency problem: how to connect to, view, operate, and collaborate on servers more efficiently and intuitively, based on SSH**.
 
-## Developing a New App
+---
 
-**🚀 Fast Track: Jump Straight into Coding**
-Want to build an app immediately? If you prefer to skip the architectural theory and start your developer journey right now, click the link below:
+## Why GMSSH?
 
-[👉 Start Your Developer Journey](https://doc-dev.gmssh.com/en/)
+As the number of servers grows, many teams run into the same issues:
 
-**📖 Understanding GMSSH Design Philosophy**
-If you prefer to grasp the underlying architecture before writing code, here is a deep dive into the core concepts:
+- SSH addresses, ports, usernames, and keys are scattered across terminals, scripts, and documents
+- As server count increases, switching connections, grouping hosts, and distinguishing environments becomes messy
+- Sharing host access information across team members is inconvenient and often insecure
+- Traditional panels are good at environment and application management, but not ideal as a unified SSH access entry
+- Bastion systems are powerful, but often come with higher deployment, learning, and maintenance costs
 
-**1. 🏗️ GMSSH Development Workflow**
-To start, one must understand the core architectural philosophy. GMSSH is far more than just a Web server—it is an intricate process orchestration system.
+GMSSH aims to provide a solution **between native SSH and heavyweight operations systems** — lighter, clearer, and more suitable for daily use.
 
-**2. 🧠 The Core Engine: ga_main**
-Within GMSSH's topology, ga_main is the cornerstone, serving as the system's "central nervous system" and routing nexus.
+---
 
-Distinct from LAMP: Unlike Apache/Nginx which often process business logic directly, ga_main is architected as a lightweight, high-performance microkernel.
+## Product Positioning
 
-**3. 🛡️ Process Isolation & Stability**
-ga_main is fully decoupled from business logic; its sole purpose is lifecycle management and traffic dispatching. All features—from the official File Manager to custom Nginx Managers—run as isolated child processes.
+GMSSH is best understood as:
 
-Sandboxed Reliability: If a third-party plugin crashes (e.g., due to memory leaks), it only terminates that single process. ga_main and other services remain unaffected.
+- A **unified server access entry**
+- An **SSH-centered host management tool**
+- A **lightweight operations platform for individual developers and small teams**
 
-Auto-Recovery: The system actively monitors processes and handles restarts automatically.
+Its focus is not to “take over everything on the server,” but to:
 
-**4. 🌉 Gateway & Protocol Translation**
-ga_main functions as the ingress gateway, aggregating all traffic from client interfaces (Electron/Web).
+- Make connection management more organized
+- Make host access more efficient
+- Make team collaboration more controllable
+- Make remote operations entry more lightweight
 
-Responsibilities: It handles Request Validation (AuthN/AuthZ), App ID resolution, and dispatching.
+> **In one sentence: traditional panels manage server internals, while GMSSH manages the server access and connection system.**
 
-Transparent Bridge: It seamlessly converts external HTTP/WebSocket protocols into internal IPC (Inter-Process Communication).
+---
 
-**5. ⚡ Kernel-level Data Transmission**
-While standard TCP/IP incurs overhead (segmentation, checksums, firewall filtering), GMSSH leverages Unix Domain Sockets (UDS) for superior performance. Data is copied directly within Kernel Memory Buffers, bypassing the network stack entirely.
+## Why choose GMSSH?
 
-🚀 Zero-Copy Performance: Drastically reduces CPU context switches.
+### 1. Better for multi-host management
+When your infrastructure grows from a few machines to dozens or hundreds, the real challenge is no longer whether you can connect — it is how to organize, switch, manage, and collaborate efficiently.
 
-⏱️ Low Latency: Microsecond-level latency (vs. TCP's millisecond-level), perfect for "Real-time Terminals" or "Log Streams."
+### 2. Lighter than traditional panels
+GMSSH does not follow the “all-in-one control panel” approach. It does not aim to replace every operations task. Instead, it focuses on the SSH workflow itself, reducing invasiveness and resource overhead.
 
-🔒 Security: Relies on file system permissions. Only ga_main and the App owner can access the socket, fundamentally eliminating port scanning risks.
+GMSSH connects through SSH and starts lightweight components only when needed, minimizing long-running processes and additional exposure on the server.
 
-**6. 🔄 Dual-Mode Startup Support**
-Production (Recommended): Use UDS for maximum security and performance.
+### 3. Clearer than native SSH
+Native SSH is powerful and reliable. But when the number of hosts, users, keys, environments, and team members grows, connection details and operation records become fragmented.
 
-Development/Debug: GMSSH supports backend services via HTTP ports, facilitating development on Windows or cross-node deployment scenarios where UDS isn't natively supported.
+GMSSH keeps the SSH model while providing clearer host management, grouping, access entry, and visualized operations experience.
 
-**7. 📜 JSON-RPC 2.0 Protocol**
-At the application layer, GMSSH adopts JSON-RPC 2.0—a stateless, lightweight RPC protocol. This makes the backend language-agnostic (Python, Go, Rust, Node.js, etc.).
+### 4. Easier to adopt than heavyweight bastion systems
+Lower learning cost, lower deployment cost, and lower maintenance burden — making it better suited for individuals, small teams, and growing organizations.
 
-Request Structure:
+### 5. Open source, self-hosted, and fully controllable
+Users can choose the deployment and usage model that fits their environment. Host information, access methods, and future extensibility remain under your control.
 
-jsonrpc: Version
+---
 
-method: Function name
+## What problems does GMSSH solve?
 
-params: Arguments (object/array)
+GMSSH mainly addresses the following common problems:
 
-id: Unique identifier
+- **Scattered connection information**: host addresses, ports, keys, and accounts are stored in multiple places and are hard to maintain centrally
+- **Multi-host management chaos**: as the number of machines grows, there is no clear organization across environments, projects, and services
+- **Inefficient team collaboration**: access details are shared through chat messages, verbal communication, or manual documents, which is inefficient and insecure
+- **Misaligned panel capabilities**: many panels are better at managing server environments than managing SSH connection relationships
+- **Overly heavy traditional solutions**: enterprise-grade systems are powerful, but often exceed the actual needs of many teams
 
-Response Structure:
+---
 
-Returns execution result or an error object.
+## Who is GMSSH for?
 
+GMSSH is suitable for:
 
-## Submitting Bugs & Features
+- Individual developers managing multiple Linux servers
+- Small teams that need a unified SSH access entry
+- Teams that primarily rely on command-line operations but want better host organization
+- Users who do not need a heavyweight bastion host yet, but do need connection management and collaboration features
+- Scenarios where servers are managed through SSH instead of installing traditional panels on every machine
 
-We use GitHub Issues to track bugs and features.
+---
 
-* **Bugs:** Please use the **Bug Report** template. Attach screenshots and the `gmssh-sdk` version you are using.
-* **Features:** Please use the **Feature Request** template. clearly describe the "Pain Point" and your proposed solution.
+## GMSSH vs traditional panels and systems
 
-## Pull Request Guidelines
+| Dimension | Native SSH | Traditional Panels | Modern Panels | Bastion Hosts / Heavy Ops Systems | GMSSH |
+|---|---|---|---|---|---|
+| Core positioning | Command-line remote access | Server environment and site management | Panel-based service and app management | Centralized ops, security auditing, permission control | SSH access and multi-host management platform |
+| Single-host management | High | High | High | Medium | High |
+| Multi-host management | Low | Medium | Medium | High | High |
+| SSH experience | High | Medium | Medium | High | High |
+| Integrated terminal and file management | Low | Medium | Medium | Medium | High |
+| Team sharing of host information | Low | Medium | Medium | High | Improving |
+| Permissions and auditing | Low | Medium | Medium | High | Improving |
+| Deployment complexity | Low | Medium | Medium | High | Low |
+| Long-running components on server | None | Yes | Yes | Usually yes | Lightweight on-demand agent |
+| Extra management ports required | No | Usually yes | Usually yes | Depends on architecture | No extra management ports required |
+| Suitable for individuals / small teams | Medium | High | High | Low to Medium | High |
+| Resource usage | Low | Medium | Medium | Medium to High | Low |
+| Application environment configuration | Low | High | High | Medium | Extensible |
+| Unified access entry | Low | Medium | Medium | High | High |
+| Open source / self-hosted | Depends on tool | Depends on product | Depends on product | Depends on product | Supported |
 
-Ready to submit your code? Great!
+---
 
-1.  **Sync First:** Ensure your fork is up-to-date with the `main` branch.
-2.  **Descriptive Title:** Use a clear title (e.g., `feat: add support for dark mode in Redis plugin`).
-3.  **Checklist:**
-    * [ ] My code follows the code style of this project (ESLint/Prettier).
-    * [ ] I have performed a self-review of my own code.
-    * [ ] I have commented on my code, particularly in hard-to-understand areas.
-    * [ ] I have verified that the app runs smoothly in GMSSH Client v2.0+.
+## How to choose?
 
-## App Center Publishing
+If you need:
 
-If you want your app to be listed in the **Official GMSSH App Center** (available to all users):
+- **Website environment setup, database GUI management** → choose a traditional panel
+- **Enterprise-level auditing, approval workflows, compliance controls** → choose a bastion host system
+- **More efficient SSH management and multi-host collaboration** → choose **GMSSH**
 
-1.  Submit a Pull Request to the `gmssh-marketplace` registry (or submit a form on our website).
-2.  **Security Review:** Our team will review your code to ensure no malicious operations (e.g., stealing SSH keys).
-3.  **Approval:** Once approved, your app will be listed, and you will receive the **"GMSSH Contributor"** badge!
+---
 
+## Core capabilities
+
+> The following items can be adjusted based on current product status.
+
+- Host asset management
+- SSH connection management
+- Grouping and tagging
+- Multi-environment host organization
+- Unified access entry
+- Team collaboration support
+- Permission control
+- Secure access mechanisms
+- Open-source self-hosted deployment
+
+---
+
+## Screenshots
+
+### Client
+<img width="2880" height="1800" alt="客户端英文版" src="https://github.com/user-attachments/assets/396513c4-e795-4e69-9234-bae463a3490b" />
+
+### Desktop
+<img width="1440" height="775" alt="英文版" src="https://github.com/user-attachments/assets/0090af5f-0659-414b-baef-4b2ab5c64ef7" />
+
+### App Center
+<img width="1440" height="777" alt="截屏2026-05-06 18 03 44" src="https://github.com/user-attachments/assets/9591dcbe-5cd4-4316-8bfd-84d671401402" />
+
+### Terminal + AI
+<img width="820" height="559" alt="截屏2026-05-06 18 04 34" src="https://github.com/user-attachments/assets/c593af72-7110-431b-a6d1-1023b709fae8" />
+
+### Gemius 2.0
+<img width="724" height="717" alt="截屏2026-05-06 18 04 59" src="https://github.com/user-attachments/assets/9db08aba-3d4d-4b67-b7f9-e0891659f142" />
+
+---
+
+## Quick Start
+
+### Option 1: Deploy with Docker
+
+Deployment page: https://www.gm.cn/private
+
+### Option 2: Read the documentation
+
+Documentation: https://doc.gm.cn/zh/guide/
+
+Quick start: [Web Version](https://web.gm.cn/newweb/#/)
+
+---
+
+## Roadmap
+
+GMSSH is evolving from an open-source tool into a more complete server access and management platform.
+
+Future improvements will continue to focus on:
+
+- Better host organization capabilities
+- More fine-grained permission control
+- Clearer team collaboration mechanisms
+- Richer operation auditing features
+- More flexible automation and extensibility
+
+---
+
+## Why is GMSSH worth watching?
+
+Because it fills a long-standing gap between several traditional solutions:
+
+- More organized than native SSH
+- Lighter and better suited for connection management than traditional panels
+- Simpler, lower-cost, and easier to adopt than bastion host systems
+
+The value of GMSSH is not in “taking over everything on the server,” but in this:
+
+> Making server access itself simpler, clearer, and more professional.
+
+---
+
+## Community and Support
+
+Project homepage: https://github.com/GMSSH/GMSSH
+
+Issue reporting: Issues
+
+Feature requests: Issues / Discussions
+
+Documentation: [Product Docs](https://doc.gm.cn/zh/guide/)
+
+If this project helps you, feel free to give it a Star.
+
+---
 
 ## Star History
 
 [![Star History Chart](https://api.star-history.com/svg?repos=GMSSH/GMSSH&type=date&legend=top-left)](https://www.star-history.com/#GMSSH/GMSSH&type=date&legend=top-left)
+
 ---
-*Happy Coding!*
 
-*The GMSSH Team*
+*Happy coding!*
 
+*GMSSH Team*
