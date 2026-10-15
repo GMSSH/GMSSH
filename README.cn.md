@@ -10,8 +10,8 @@
 ![Chinese](https://img.shields.io/badge/Lang-%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87-brightgreen) ![English](http://img.shields.io/badge/Lang-English-blue)
 
 <p>  
-  <a href="#什么是极目Linux桌面？">产品介绍</a> •  
-  <a href="#为什么选择极目Linux桌面？">核心优势</a> •  
+  <a href="#什么是极目Linux桌面?">产品介绍</a> •  
+  <a href="#为什么选择极目Linux桌面?">核心优势</a> •  
   <a href="#极目Linux桌面与传统服务器管理方式的区别">极目Linux桌面 与传统面板/系统的区别</a> •  
   <a href="#快速开始">快速开始</a>  
 </p>
@@ -21,7 +21,7 @@
 ---
 <img width="3600" height="2166" alt="image" src="https://github.com/user-attachments/assets/75ed8016-e8f7-49fe-827e-9c6bf2165917" />
 
-## 什么是极目Linux桌面？
+## 什么是极目Linux桌面?
 
 极目 Linux 桌面是一款基于 SSH 的 Linux 服务器桌面管理工具。
 
@@ -61,7 +61,7 @@
 
 ---
 
-## 为什么选择极目 Linux 桌面？
+## 为什么选择极目Linux桌面?
 
 ### 1. 更适合多服务器管理
 
