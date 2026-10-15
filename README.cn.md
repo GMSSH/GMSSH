@@ -7,9 +7,7 @@
 
 #### 简单、安全、智能的桌面端可视化交互界面，帮您轻松掌握Linux服务器
 
-![Chinese](https://img.shields.io/badge/Lang-%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87-brightgreen)
-
-![English](http://img.shields.io/badge/Lang-English-blue)
+![Chinese](https://img.shields.io/badge/Lang-%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87-brightgreen) ![English](http://img.shields.io/badge/Lang-English-blue)
 
 <p>  
   <a href="#什么是 极目Linux桌面？">产品介绍</a> •  
@@ -21,6 +19,7 @@
 </div>
 
 ---
+<img width="3600" height="2166" alt="image" src="https://github.com/user-attachments/assets/75ed8016-e8f7-49fe-827e-9c6bf2165917" />
 
 ## 什么是极目 Linux 桌面？
 
@@ -61,19 +60,22 @@
 
 ## 极目 Linux 桌面的产品定位
 
-极目 Linux 桌面可以理解为：
+极目 Linux 桌面是一套面向 Linux 服务器的桌面化使用与管理平台。
 
-- **统一的 Linux 服务器访问入口**
-- **以 SSH 为核心的多主机管理工具**
-- **面向个人开发者和中小团队的轻量运维工作台**
+它通过熟悉、直观的桌面界面，将文件、终端、浏览器、应用和 AI 助手集中在一个工作空间中，让不熟悉 Linux 命令的用户也能快速连接、理解和管理服务器。
 
-它不追求接管服务器上的所有运维工作，而是专注于解决服务器访问和日常操作中的高频问题：
+用户无需先掌握复杂的命令行，也无需在服务器上安装完整的桌面环境。通过 SSH 连接，即可像使用 Windows 一样完成常见的服务器操作。
 
-- 让连接信息更有组织；
-- 让主机切换更高效；
-- 让服务器操作更直观；
-- 让远程运维入口更轻量；
-- 为团队共享和协作提供基础支持。
+极目 Linux 桌面致力于：
+
+- **降低 Linux 的学习门槛**，让新用户能够快速上手；
+- **用可视化操作替代重复的命令记忆**，让服务器管理更加直观；
+- **用 GMAI 辅助理解和执行运维任务**，让复杂操作更容易完成；
+- **统一管理多台 Linux 服务器**，让连接、切换和日常工作更加高效；
+- **保留终端的灵活性**，满足有经验用户的专业操作需求；
+- **让 Linux 服务器成为人人都能使用的工作环境**。
+
+> **极目 Linux 桌面的目标，是让命令行不再成为使用 Linux 的门槛，让更多人能够简单、高效地使用 Linux 服务器。**
 
 ---
 
@@ -105,7 +107,7 @@
 
 ### 5. 可私有部署、自托管、自主可控
 
-极目 Linux 桌面开支持根据实际环境选择使用和部署方式。
+极目Linux桌面支持根据实际环境选择使用和部署方式。
 
 用户可以自主管理服务器连接信息、部署环境和扩展能力，减少对单一平台和固定服务模式的依赖。
 
@@ -198,23 +200,31 @@
 
 ### 客户端
 
-![客户端](https://github.com/user-attachments/assets/fae1000a-dc69-4666-a987-8e6939256573)
+![客户端](https://github.com/user-attachments/assets/77032159-103f-43ea-a5ed-67b74a4e31c7)
 
 ### 桌面
 
-![桌面](https://github.com/user-attachments/assets/e808692d-1cf5-4246-a51f-562cd0dde8b2)
+![桌面](https://github.com/user-attachments/assets/c2d7af27-5439-41dc-9626-246644581751)
+
+### 文件管理
+
+![文件管理](https://github.com/user-attachments/assets/133623af-d9e3-479d-a4e4-1248a724f277)
 
 ### 应用中心
 
-![应用中心](https://github.com/user-attachments/assets/1c4c7cd1-48df-4244-b6f1-802602549d41)
+![应用中心](https://github.com/user-attachments/assets/b44e125d-2f9e-4b98-8c12-aa38604ac8fe)
 
 ### 终端➕AI
 
-![截屏2026-05-06 16 44 37](https://github.com/user-attachments/assets/755b1edb-377a-4a08-a25e-67c50079dfb3)
+![终端AI](https://github.com/user-attachments/assets/4f593feb-30a9-4a93-8f6b-8040ad548e03)
 
 ### GMAI智能体
 
-![image](https://github.com/user-attachments/assets/a010e6de-1dd0-4b1c-8b94-1d09b2e2f4aa)
+![GMAI智能体](https://github.com/user-attachments/assets/087cbfff-c461-49f9-90ab-b91f987fe349)
+
+### 浏览器
+
+![浏览器](https://github.com/user-attachments/assets/87c82f8a-a0b4-45eb-a53d-40e2d327ac67)
 
 ---
 
