@@ -7,14 +7,15 @@
 
 # 极目Linux桌面
 
-### 简单、安全、智能的桌面端可视化交互界面，帮您轻松掌握Linux服务器
+### 无需安装桌面环境，通过 SSH 连接即可像使用 Windows 一样管理 Linux 服务器。
+#### 简单、安全、智能的桌面端可视化交互界面，帮您轻松掌握Linux服务器
 
 
 [![Chinese](https://img.shields.io/badge/Lang-%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87-brightgreen)](https://github.com/GMSSH/GMSSH/blob/main/README.cn.md)
 [![English](http://img.shields.io/badge/Lang-English-blue)](https://github.com/GMSSH/GMSSH/blob/main/README.md)
 
 <p>
-  <a href="#什么是-极目Linux桌面">产品介绍</a> •
+  <a href="#什么是 极目Linux桌面？">产品介绍</a> •
   <a href="#为什么选择-极目Linux桌面">核心优势</a> •
   <a href="极目Linux桌面 与传统面板/系统的区别">极目Linux桌面 与传统面板/系统的区别</a> •
   <a href="#快速开始">快速开始</a>
