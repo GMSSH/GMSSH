@@ -228,7 +228,7 @@
 
 ---
 
-## 快速开始（如何使用）
+## 快速开始
 
 ### 方式一：Web在线版本
 
@@ -294,5 +294,10 @@
 
 ## Star 历史
 
-## [[Star History Chart](https://api.star-history.com/svg?repos=GMSSH/GMSSH\&type=date\&legend=top-left)](https://www.star-history.com/#GMSSH/GMSSH\&type=date\&legend=top-left)
-
+<a href="https://www.star-history.com/?repos=GMSSH%2FGMSSH%255C%2Cgmssh%2Fgmssh&type=date&legend=bottom-right">
+ <picture>
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=GMSSH/GMSSH%5C%2Cgmssh/gmssh&type=date&theme=dark&legend=bottom-right" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=GMSSH/GMSSH%5C%2Cgmssh/gmssh&type=date&legend=bottom-right" />
+   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=GMSSH/GMSSH%5C%2Cgmssh/gmssh&type=date&legend=bottom-right" />
+ </picture>
+</a>
