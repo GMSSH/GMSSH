@@ -311,6 +311,25 @@ If GMSSH helps you, please consider giving the project a Star ✨.
 | `apps/` | App Center index — installable applications for GMSSH |
 | `examples/` | Application examples (web-html / web-vue / python) |
 
+```text
+GMSSH/
+├── README.md / README.cn.md        # English / Chinese docs
+├── sdk/                            # Developer SDKs
+│   ├── app-sdk-py/                 # Python backend SDK (simplejrpc, on PyPI)
+│   └── gmscaffold/                 # Scaffold CLI (gmcli, on PyPI)
+├── apps/                           # App Center
+│   ├── README.md / README.en.md    # App directory (zh/en)
+│   ├── LICENSE
+│   └── Ai-Code-Agent/              # AI coding agent skills
+├── examples/                       # App examples
+│   ├── app-sample-py/              # Python app project example
+│   ├── app-sample-web-html/        # Plain-HTML frontend example
+│   └── app-sample-web-vue/         # Vue 3 frontend example
+├── gmssh-app-skeleton-back-py/     # Python backend skeleton (dev guidelines)
+├── gmssh-app-skeleton-go/          # Go JSON-RPC framework (simplejrpc-go)
+└── gmssh-front-sdk/                # Frontend SDK (npm: gm-app-sdk)
+```
+
 ## Ecosystem
 
 | Repository | What it is |
