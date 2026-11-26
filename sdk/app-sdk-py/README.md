@@ -5,6 +5,13 @@
 simplejrpc
 ==========
 
+[English](README.md) | [简体中文](README.cn.md)
+
+> **GMSSH（极目桌面）生态** · 官网 <https://www.gm.cn> · 文档 <https://doc.gm.cn> · 社区 <https://hub.gm.cn>
+>
+> GMSSH 应用 Python 后端 SDK（PyPI 包名 simplejrpc）：基于 Unix Socket + JSON-RPC 2.0 与桌面端通信。
+
+
 
 # 1. Getting Started Quickly
 
