@@ -3,6 +3,8 @@
 
 # 极目Linux桌面
 
+[English](README.md) | **简体中文**
+
 > **GMSSH（极目桌面）生态** · 官网 <https://www.gm.cn> · 文档 <https://doc.gm.cn> · 社区 <https://hub.gm.cn>
 >
 > 本仓库是 GMSSH 生态的**开发者入口**：应用 SDK、`gmcli` 脚手架、应用中心索引与应用示例。GMSSH 桌面客户端本体闭源，请从官网获取。
