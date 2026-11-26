@@ -4,11 +4,6 @@
 <head>
   <meta charset="UTF-8">
   <title>demo</title>
-  <style>
-    body {
-      background: var(--jm-theme);
-    }
-  </style>
 </head>
 
 <body>
@@ -26,64 +21,62 @@
   <button class="button10">打开日志</button>
   <button class="button11">上传文件</button>
 </div>
+<script src="https://down-gmb.oss-cn-zhangjiakou.aliyuncs.com/appWebJs/gmAppSdk.js"></script>
 <script>
   console.log(window.$gm)
-  $gm.props.childDestroyedListener(() => {
-    console.log('子应用销毁了')
-  });
-  $gm.props.childRectListener((res) => {
+  $gm.childRectListener((res) => {
     const { width, height } = res
     console.log('实时获取应用窗口尺寸，宽：' + width + '，高：' + height);
   });
 
   document.querySelector('.button1').addEventListener('click', function () {
-    $gm.props.openFolder('/');
+    $gm.openFolder('/');
   })
   document.querySelector('.button2').addEventListener('click', function () {
-    $gm.props.message.success('打开文件系统成功');
+    $gm.message.success('打开文件系统成功');
   })
   document.querySelector('.button3').addEventListener('click', function () {
-    $gm.props.dialog.warning({
+    $gm.dialog.warning({
       title: '提示',
       content: '这是提示的内容',
       positiveText: '确定',
       negativeText: '取消',
       maskClosable: false,
       onPositiveClick: () => {
-        $gm.props.message.success('点击确定');
+        $gm.message.success('点击确定');
         console.log('点击确定');
       },
     });
   })
   document.querySelector('.button4').addEventListener('click', function () {
-    $gm.props.closeApp();
+    $gm.closeApp();
   })
   document.querySelector('.button5').addEventListener('click', function () {
-    $gm.props.chooseFolder((res) => {
-      $gm.props.message.success('选择文件夹成功' + res);
+    $gm.chooseFolder((res) => {
+      $gm.message.success('选择文件夹成功' + res);
       console.log(res);
     }, '/');
   })
   document.querySelector('.button6').addEventListener('click', function () {
-    $gm.props.chooseFile((res) => {
-      $gm.props.message.success('选择文件成功' + res);
+    $gm.chooseFile((res) => {
+      $gm.message.success('选择文件成功' + res);
       console.log(res);
     }, '/');
   })
   document.querySelector('.button7').addEventListener('click', function () {
-    const { width, height } = $gm.props.getRectSize()
+    const { width, height } = $gm.getRectSize()
     console.log('获取应用初始尺寸，宽：' + width + '，高：' + height);
-    $gm.props.message.success('获取应用初始尺寸，宽：' + width + '，高：' + height);
+    $gm.message.success('获取应用初始尺寸，宽：' + width + '，高：' + height);
   })
   document.querySelector('.button8').addEventListener('click', function () {
-    $gm.props.openCodeEditor('/yarn.lock');
+    $gm.openCodeEditor('/yarn.lock');
   })
   document.querySelector('.button9').addEventListener('click', function () {
-    $gm.props.openShell({ arr: ['cd /www\n'] });
+    $gm.openShell({ arr: ['cd /www\n'] });
   })
 
   document.querySelector('.button10').addEventListener('click', function () {
-    $gm.props.openLog('日志名称', {
+    $gm.openLog('日志名称', {
       fun: () => {
         console.log('日志内容')
       },
@@ -125,9 +118,18 @@
       });
     }
     const files = await getWinFiles();
-    $gm.props.openUpload({ files, path: '/www' });
+    $gm.openUpload({ files, path: '/www' });
   })
-  console.log($gm.props.request)
+  // 初始化
+  window.$gm.request('/api/center/check_status', {
+            method: 'post',
+            data: {
+              app_name: window?.$gm?.name,
+              version: window?.$gm?.version,
+              communication_type: 'socket',
+            },
+          })
+
 
 </script>
 </body>
