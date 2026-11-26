@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "gmscaffold"
-version = "1.0.9"
+version = "1.0.7"
 description = "GM Scaffold"
 authors = ["yao <1125564921@qq.com>"]
 license =  "MIT"

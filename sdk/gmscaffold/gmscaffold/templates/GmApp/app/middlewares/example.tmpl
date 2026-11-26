@@ -13,9 +13,9 @@ class ExampleMiddleware(RPCMiddleware):
     """ """
 
     def process_request(self, request, context):
-        # print("[middleware-request] ", request, context)
+        print("[middleware-request] ", request, context)
         return request
 
     def process_response(self, response, context):
-        # print("[middleware-response] ", response, context)
+        print("[middleware-response] ", response, context)
         return response

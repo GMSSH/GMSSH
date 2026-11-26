@@ -12,9 +12,8 @@ class Example:
     def __init__(self):
         pass
 
-    async def hello(self, kwargs):
+    async def hello(self, lang, action):
         """ """
-        name = kwargs.get("name", "world")
-        return f"hello {name}"
+        return "hello world"
 
 

@@ -5,6 +5,13 @@
 gmscaffold
 ==========
 
+[English](README.md) | [简体中文](README.cn.md)
+
+> **GMSSH（极目桌面）生态** · 官网 <https://www.gm.cn> · 文档 <https://doc.gm.cn> · 社区 <https://hub.gm.cn>
+>
+> GMSSH 应用开发脚手架：一行命令生成标准化微应用工程结构。
+
+
 ## 1. Preparing the Development Environment
 
 ### 1.1 Introduction
@@ -72,7 +79,6 @@ Please enter contact email: xxx@163.com
 Please enter the project version: 0.0.1
 Please enter the project description: example
 DEBUG:GmScaffold:[example] create_gm_app successfully
-
 ```
 
 ---

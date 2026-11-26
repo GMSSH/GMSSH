@@ -10,30 +10,22 @@ import os
 
 from simplejrpc.app import ServerApplication
 from simplejrpc.response import jsonify
-from simplejrpc.i18n import T as i18n
 
 from app.services.example import Example
 from app.schemas.example import ExampleForm
 from app.middlewares.example import ExampleMiddleware
 
+
 current_path = os.path.dirname(__file__)
-config_path = os.path.join(current_path, "config.yaml")
-# 这个路径是插件的socket路径，必须是安装目录下的 tmp目录，并且文件名必须为 app.sock
-socket_path = "/.__gmssh/plugin/official/example/tmp/app.sock"
-i18n_path = os.path.join(current_path, "i18n")
-app = ServerApplication(socket_path=socket_path, i18n_dir=i18n_path, config_path=config_path)
+socket_path = os.path.join(current_path, "tmp.socket")
+app = ServerApplication(socket_path)
 app.middleware(ExampleMiddleware())
 
 
 @app.route(name="hello", form=ExampleForm)
-async def hello(**kwargs):
+async def hello(lang, action):
     """ """
     example = Example()
-    data = await example.hello(kwargs)
-    return jsonify(data=data, msg=i18n.translate("STATUS_OK"))
+    data =  await example.hello(lang, action)
+    return jsonify(data=data, msg="OK")
 
-# 状态检查接口
-@app.route(name="ping")
-async def ping(**kwargs):
-    """ """
-    return jsonify(data="pong", msg=i18n.translate("STATUS_OK"))

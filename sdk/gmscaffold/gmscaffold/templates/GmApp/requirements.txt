@@ -1,2 +1,1 @@
-simplejrpc==2.2.2
-nuitka
+simplejrpc
