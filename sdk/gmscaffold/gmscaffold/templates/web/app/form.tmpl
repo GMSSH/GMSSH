@@ -1,0 +1,16 @@
+"""
+@文件        :form.py
+@说明        :{{ description }}
+@时间        :{{ date }}
+@作者        :{{ author }}
+@邮箱        :{{ email }}
+@版本        :{{ version }}
+"""
+
+from {{ package }}.core.forms import *
+
+
+class {{ name | to_capitalize }}StringForm_V1(BaseForm):
+    """ """
+
+    uname: str = StringField(validators=[RequireValidator("缺少必传参数")])

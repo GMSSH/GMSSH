@@ -1,0 +1,43 @@
+"""
+@文件        :view.py
+@说明        :{{ description }}
+@时间        :{{ date }}
+@作者        :{{ author }}
+@邮箱        :{{ email }}
+@版本        :{{ version }}
+"""
+
+from logging import getLogger
+from typing import Awaitable, Callable, List
+
+from sanic.exceptions import NotFound
+from sanic.views import HTTPMethodView
+from sanic import Blueprint, HTTPResponse, Request
+
+from {{ package }}.core import exceptions, validate
+from {{ package }}.contrib.csrf import csrf_protected  # type: ignore
+from {{ package }}.core.pagination import Pagination
+from {{ package }}.core.response import response
+from {{ package }}.core.status_code import StatusCode
+from {{ package }}.core.wrapper import serializer
+
+from .executor import {{ name | to_capitalize }}Executor
+from .hydrator import {{ name | to_capitalize }}Hydrator
+from .form import {{ name | to_capitalize }}StringForm_V1
+
+
+bp = Blueprint("{{ name | to_capitalize }}", url_prefix="/{{ name }}")
+logger = getLogger("{{ package }}")
+
+
+class {{ name | to_capitalize }}ListView(HTTPMethodView, attach=bp):
+
+    @staticmethod
+    async def get(request: Request, pagination: Pagination):
+
+        hydrator = {{ name | to_capitalize }}Hydrator()
+        executor = {{ name | to_capitalize }}Executor(hydrator)
+        kwargs = {**pagination.to_dict()}
+        getter: Callable[..., Awaitable[List[object]]] = executor.get_all_authors
+        authors = []
+        return {"meta": pagination, "authors": authors}

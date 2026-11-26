@@ -1,0 +1,39 @@
+"""
+@文件        :__init__.py
+@说明        :{{ description }}
+@时间        :{{ date }}
+@作者        :{{ author }}
+@邮箱        :{{ email }}
+@版本        :{{ version }}
+"""
+import os
+from {{ name }}.app.settings import settings
+
+class Settings:
+    """ """
+    def __init__(self):
+        """ """
+        self.settings = settings
+    
+    def config_path(self):
+        """ """
+        return self.settings.CONFIG_PATH
+
+    def glob_config(self) -> str:
+        """ """
+        root_dir = self.config_path()
+        for child_file in os.listdir(root_dir):
+            child_path = os.path.join(root_dir, child_file)
+            if os.path.isdir(child_path):
+                continue
+            return child_path
+
+    def config_split(self):
+        """ """
+        child_path = self.glob_config()
+        config_path, config_file = os.path.split(child_path)
+        config_filename, config_suffix = config_file.split(".")
+        return config_path, config_filename, config_suffix
+
+
+    # TODO: 自行根据场景实现即可

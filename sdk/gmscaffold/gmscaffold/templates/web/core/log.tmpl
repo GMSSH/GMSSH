@@ -1,0 +1,146 @@
+"""
+@文件        :log.py
+@说明        :{{ description }}
+@时间        :{{ date }}
+@作者        :{{ author }}
+@邮箱        :{{ email }}
+@版本        :{{ version }}
+"""
+
+import logging.handlers
+import os
+import logging
+import sys
+from functools import partial
+from typing import Dict
+
+from sanic import Sanic
+from sanic.log import access_logger, error_logger, logger
+
+from .env import EnvironMent
+
+app_logger = logging.getLogger("web")
+
+
+class BaseHandler:
+    """ """
+
+    filename = ""
+
+    @classmethod
+    def from_logger(cls, app: Sanic, app_logger: logging.Logger, formatter: str):
+        """ """
+        if not cls.filename:
+            return
+
+        filename = cls.filename
+        if log_path := app.config.get("LOG_PATH", app.config.get("BASE_DIR")):
+            _log_path = os.path.join(log_path, "logs")
+            os.makedirs(_log_path, exist_ok=True)
+            filename = os.path.join(_log_path, filename)
+
+        file_handler = logging.handlers.TimedRotatingFileHandler(
+            filename, when="D", backupCount=10
+        )
+        file_handler.setFormatter(formatter)
+        app_logger.addHandler(file_handler)
+
+
+class LocalHandler(BaseHandler):
+    """ """
+
+
+class ProdHandler(BaseHandler):
+    """ """
+
+    filename = "output.log"
+
+
+class TestHandler(BaseHandler):
+    """ """
+
+    filename = "test.log"
+
+
+handlers: Dict[str, BaseHandler] = {
+    EnvironMent.DEV: LocalHandler,
+    EnvironMent.PROD: ProdHandler,
+    EnvironMent.TEST: TestHandler,
+}
+
+DEFAULT_LOGGING_FORMAT = (
+    "[%(asctime)s] [%(levelname)s] [%(filename)s:%(lineno)s] "
+    "%(request_info)s%(message)s"
+)
+DEFAULT_LOGGING_DATEFORMAT = "%Y-%m-%d %H:%M:%S %z"
+old_factory = logging.getLogRecordFactory()
+
+
+class ColorFormatter(logging.Formatter):
+    """ """
+
+    COLORS = {
+        "DEBUG": "\033[34m",
+        "WARNING": "\033[01;33m",
+        "ERROR": "\033[01;31m",
+        "CRITICAL": "\033[02;47m\033[01;31m",
+    }
+
+    def format(self, record) -> str:
+        """ """
+        message = super().format(record)
+        if prefix := self.COLORS.get(record.levelname):
+            message = f"{prefix}{message}\033[0m"
+        return message
+
+
+def _get_formatter(is_local, fmt, datefmt):
+    """ """
+    formatter_type = logging.Formatter
+    if is_local and sys.stdout.isatty():
+        formatter_type = ColorFormatter
+
+    return formatter_type(
+        fmt=fmt,
+        datefmt=datefmt,
+    )
+
+
+def _record_factory(*args, app, **kwargs):
+    """ """
+    record = old_factory(*args, **kwargs)
+    record.request_info = ""
+
+    if hasattr(app.ctx, "request"):
+        if request := app.ctx.request.get(None):
+            display = " ".join([str(request.id), request.method, request.path])
+            record.request_info = f"[{display}] "
+
+    return record
+
+
+def setup_logging(app: Sanic, setup_factory: bool = True):
+    """ """
+    environment = app.config.get("ENVIRONMENT", EnvironMent.DEV)
+    logging_level = app.config.get(
+        "LOGGING_LEVEL",
+        logging.DEBUG if environment == EnvironMent.DEV else logging.INFO,
+    )
+    fmt = app.config.get("LOGGING_FORMAT", DEFAULT_LOGGING_FORMAT)
+    datefmt = app.config.get("LOGGING_DATEFORMAT", DEFAULT_LOGGING_DATEFORMAT)
+    formatter = _get_formatter(environment == EnvironMent.DEV, fmt, datefmt)
+
+    handler = logging.StreamHandler()
+    handler.setFormatter(formatter)
+
+    for lggr in (app_logger, access_logger, logger, error_logger):
+        for hndlr in lggr.handlers:
+            lggr.removeHandler(hndlr)
+        lggr.addHandler(handler)
+        lggr.setLevel(logging_level)
+
+    if e_handler := handlers.get(environment):
+        e_handler.from_logger(app, app_logger, formatter)
+
+    if setup_factory:
+        logging.setLogRecordFactory(partial(_record_factory, app=app))

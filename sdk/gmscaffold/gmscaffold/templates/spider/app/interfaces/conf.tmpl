@@ -1,0 +1,47 @@
+"""
+@文件        :conf.py
+@说明        :{{ description }}
+@时间        :{{ date }}
+@作者        :{{ author }}
+@邮箱        :{{ email }}
+@版本        :{{ version }}
+"""
+
+from abc import abstractmethod
+from dataclasses import dataclass
+from typing import Optional, Any, TypeVar
+
+
+@dataclass
+class BaseConfig(object):
+    """ """
+
+
+class BaseConfiguration(object):
+    """基础的配置处理接口"""
+
+    @abstractmethod
+    def set_next(self, handler) -> "BaseConfiguration":
+        pass
+
+    @abstractmethod
+    def parser(self, request) -> Optional[BaseConfig]:
+        pass
+
+
+class ConfigurationHandler(BaseConfiguration):
+    """Configuration 上下文管理"""
+
+    _next_handler: BaseConfiguration = None
+
+    def set_next(self, handler: BaseConfiguration) -> BaseConfiguration:
+        """ """
+        self._next_handler = handler
+        return handler
+
+    @abstractmethod
+    def parser(self, context: Any) -> BaseConfig:
+        """ """
+        if self._next_handler:
+            return self._next_handler.parser(context)
+        raise ValueError(f"无法解析配置的类型: {context}")

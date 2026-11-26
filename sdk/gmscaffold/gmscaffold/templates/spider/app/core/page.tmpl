@@ -1,0 +1,93 @@
+"""
+@文件        :page.py
+@说明        :{{ description }}
+@时间        :{{ date }}
+@作者        :{{ author }}
+@邮箱        :{{ email }}
+@版本        :{{ version }}
+"""
+
+from {{ name }}.log import logger
+from {{ name }}.app.utils.defer import Element, Page
+from {{ name }}.app.interfaces.page import BasePage
+from {{ name }}.app.interfaces.conf import BaseConfig
+from {{ name }}.app.interfaces.ele import BaseElementParser
+
+
+# +------------------------------------------------
+# 访问页面处理对象
+# 该对象主要用于处理不同的访问页面往往和元素解析对象结合使用
+# +------------------------------------------------
+class LoginPage(BasePage):
+    """登录页面"""
+
+    def __init__(self, page: Page, config: BaseConfig) -> None:
+        """ """
+        self._config = config
+        self._ele_parser = LoginElementParser(page)
+
+    def input_username(self, ele: Element, username: str):
+        """ """
+        logger.debug(f"[*] LoginPage.input_username 增在输入用户 : {username}")
+
+    def input_password(self, ele: Element, passwd: str):
+        """ """
+        logger.debug(f"[*] LoginPage.input_password 增在输入用户密码 : {passwd}")
+
+    def login(self):
+        """ """
+        username_ele = self._ele_parser.get_username_ele()
+        passwd_ele = self._ele_parser.get_passwd_ele()
+        self.input_username(username_ele, self._config.login_page_username)
+        self.input_password(passwd_ele, self._config.login_page_passwd)
+
+        # TODO: 点击
+        logger.debug("[*] LoginPage.login 点击登录")
+
+
+# TODO: 案例参考
+class LoginElementParser(BaseElementParser):
+    """登录页面的元素解析"""
+
+    def get_username_ele(self):
+        """获取用户登录的标签"""
+        ele_flag = "#username"
+        logger.debug("[*] LoginElementParser.get_username_ele called ...")
+        return self.get_ele(ele_flag)
+
+    def get_passwd_ele(self):
+        """获取用户登录的标签"""
+        ele_flag = "#passwd"
+        logger.debug("[*] LoginElementParser.get_passwd_ele called ...")
+        return self.get_ele(ele_flag)
+
+
+# +------------------------------------------------
+# 访问页面处理对象
+# 该对象主要用于处理不同的访问页面往往和元素解析对象结合使用
+# +------------------------------------------------
+class DomainPage(BasePage):
+    """域名页面"""
+
+    def __init__(self, page: Page) -> None:
+        """ """
+        self._ele_parser = DomainElementParser(page)
+
+    def get_domains(self):
+        """解析domains列表"""
+        domain_ele = self._ele_parser.get_domain_ele()
+        # TODO: 解析domains列表
+        logger.debug("[*] DomainPage.get_domains called ...")
+        return []  # 假设返回空列表
+
+
+class DomainElementParser(BaseElementParser):
+    """域名页面的元素解析"""
+
+    def get_domain_ele(self):
+        """获取用户登录的标签"""
+        ele_flag = "#domain"
+        logger.debug("[*] LoginElementParser.get_domain_ele called ...")
+        return self.get_ele(ele_flag)
+
+# TODO: 等等解析，请参考案例实现

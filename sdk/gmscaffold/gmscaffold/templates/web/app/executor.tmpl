@@ -1,0 +1,21 @@
+"""
+@文件        :executor.py
+@说明        :{{ description }}
+@时间        :{{ date }}
+@作者        :{{ author }}
+@邮箱        :{{ email }}
+@版本        :{{ version }}
+"""
+
+from typing import List, Optional
+
+
+#: 处理ORM模型数据操作
+# TODO: 路由该执行的方法即可,用来处理不通的平台兼容问题
+class {{ name | to_capitalize }}Executor(object):
+
+    model = object
+
+    def __init__(self, hydrator: Optional[object] = None) -> None:
+        """ """
+        self._hydrator = hydrator

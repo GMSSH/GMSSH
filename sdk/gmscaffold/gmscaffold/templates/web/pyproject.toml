@@ -1,0 +1,21 @@
+[tool.poetry]
+name = "{{ name }}"
+version = "{{ version }}"
+description = "{{ description }}"
+authors = ["{{ author }} {{ email }}"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+sanic = "^24.6.0"
+cryptography = "^44.0.0"
+ujson = "^5.10.0"
+sanic-ext = "^23.12.0"
+databases = "^0.9.0"
+aioredis = "^2.0.1"
+asyncpg = "^0.30.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

@@ -1,0 +1,21 @@
+# -*- encoding: utf-8 -*-
+"""
+@文件        :strconv.py
+@说明        :{{ description }}
+@时间        :{{ date }}
+@作者        :{{ author }}
+@邮箱        :{{ email }}
+@版本        :{{ version }}
+"""
+
+from {{ name }}.core.exceptions import ValueError
+
+
+def str2int(value: str | int):
+    """ """
+    if isinstance(value, int):
+        return value
+    if not value.isdigit():
+        raise ValueError("GM_STR_CONVERT_INT_TM", i18n=True)
+
+    return int(value)

@@ -1,0 +1,134 @@
+"""
+@文件        :cache.py
+@说明        :{{ description }}
+@时间        :{{ date }}
+@作者        :{{ author }}
+@邮箱        :{{ email }}
+@版本        :{{ version }}
+"""
+
+import os
+import subprocess
+import functools
+import diskcache as dc
+from functools import wraps
+from typing import Any, Callable, Coroutine, Dict, Union, cast
+
+from aioredis.client import Redis
+from sanic import Request
+from sanic.response import HTTPResponse, raw
+
+FuncT = Callable[..., Coroutine[None, None, HTTPResponse]]
+
+
+def make_key(build_key: str, request: Request) -> str:
+    return ":".join(["cached-response", build_key, request.name])
+
+
+async def set_cached_response(
+    response: HTTPResponse,
+    redis: Redis,
+    key: str,
+    exp: int,
+) -> None:
+    await redis.hmset(
+        key,
+        {
+            b"body": response.body or b"",
+            b"status": str(response.status).encode("utf-8"),
+            b"content_type": (response.content_type or "").encode("utf-8"),
+        },
+    )
+    await redis.expire(key, exp)
+
+
+async def get_cached_response(
+    request: Request, redis: Redis, key: str
+) -> Dict[str, Any]:
+    exists = await redis.hgetall(key)
+    if exists and not request.args.get("refresh"):
+        cached_response = {
+            k.decode("utf-8"): v.decode("utf-8") for k, v in exists.items()
+        }
+        cached_response["status"] = int(cached_response["status"])
+        return cached_response
+
+    return {}
+
+
+def cache_response(build_key: str, exp: int = 60 * 60 * 72) -> Callable[[FuncT], FuncT]:
+    """
+    Cache an expensive response in Redis for quicker retrieval on subsequent
+    calls to the endpoint
+    """
+
+    def decorator(f: FuncT) -> FuncT:
+        @wraps(f)
+        async def decorated_function(
+            request: Request, *handler_args: Any, **handler_kwargs: Any
+        ) -> HTTPResponse:
+            cache: Redis = request.app.ctx.redis
+            key = make_key(build_key, request)
+
+            if cached_response := await get_cached_response(request, cache, key):
+                response = raw(**cached_response)
+            else:
+                response = await f(request, *handler_args, **handler_kwargs)
+                await set_cached_response(response, cache, key, exp)
+
+            return response
+
+        return cast(FuncT, decorated_function)
+
+    return decorator
+
+
+class Wrapper:
+    """ """
+
+    def __init__(self, cache_path: str = "/tmp/gmssh/cache") -> None:
+        """constant.CACHE_TMP_PATH"""
+
+        output = subprocess.check_output("echo ~", shell=True)
+        home = os.environ.get("HOME", "") or output.decode("utf-8").strip()
+        self.cache = dc.Cache(cache_path.format(home))
+
+    # 自定义装饰器函数
+    def disk_lru_cache(self, maxsize=128):
+        """A cache for disk lru cache .
+
+        :param maxsize (int, optional): [description]. Defaults to 128.
+        """
+
+        def decorator(func):
+            """Cache the result of a function .
+            :param func ([type]): [description]
+
+            Returns:
+                [type]: [description]
+            """
+            # 通过functools.lru_cache控制缓存大小
+            memoize_func = functools.lru_cache(maxsize)(func)
+
+            @functools.wraps(func)
+            def wrapper(*args, **kwargs):
+                """Cache the result of a function .
+
+                Returns:
+                    [type]: [description]
+                """
+                key = (func.__name__, args, frozenset(kwargs.items()))
+
+                # 检查缓存中是否存在结果
+                if key in self.cache:
+                    return self.cache[key]
+
+                # 如果结果不存在，则调用原始函数
+                result = memoize_func(*args, **kwargs)
+                # 将结果存入缓存中
+                self.cache[key] = result
+                return result
+
+            return wrapper
+
+        return decorator

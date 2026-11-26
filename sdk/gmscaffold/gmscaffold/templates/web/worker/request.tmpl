@@ -1,0 +1,20 @@
+"""
+@文件        :request.py
+@说明        :{{ description }}
+@时间        :{{ date }}
+@作者        :{{ author }}
+@邮箱        :{{ email }}
+@版本        :{{ version }}
+"""
+
+from typing import Any
+
+from sanic import Request
+
+from {{ name }}.utils.eid import generate
+
+
+class WebRequest(Request):
+    @classmethod
+    def generate_id(*_: Any) -> str:
+        return generate()

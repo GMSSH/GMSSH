@@ -1,0 +1,53 @@
+"""
+@文件        :server.py
+@说明        :{{ description }}
+@时间        :{{ date }}
+@作者        :{{ author }}
+@邮箱        :{{ email }}
+@版本        :{{ version }}
+"""
+
+from typing import Tuple
+
+from sanic import Sanic
+
+# Modules imported here should NOT have a Sanic.get_app() call in the global
+# scope. Doing so will cause a circular import. Therefore, we programmatically
+# import those modules inside the create_app() factory.
+from {{ name }}.contrib.csrf import setup_csrf
+from {{ name }}.core.log import setup_logging
+from {{ name }}.core.pagination import setup_pagination
+from {{ name }}.config import Setting
+from {{ name }}.worker.module import setup_modules
+from {{ name }}.worker.request import WebRequest
+
+DEFAULT: Tuple[str, ...] = (
+    "{{ name }}.blueprints.view",
+    "{{ name }}.middleware.response",
+)
+
+
+def create_app() -> Sanic:
+    """
+    Application factory: responsible for gluing all of the pieces of the
+    application together. In most use cases, running the application will be
+    done will a None value for module_names. Therefore, we provide a default
+    list. This provides flexibility when unit testing the application. The main
+    purpose for this pattern is to avoid import issues. This should be the
+    first thing that is called.
+    """
+    # if module_names is None:
+    module_names = DEFAULT
+
+    app = Sanic("{{ name }}", request_class=WebRequest)
+    app.config.update_config(Setting(app))
+
+    setup_logging(app)
+    setup_pagination(app)
+    # Use external authentication
+    # setup_auth(app)
+    setup_modules(app, *module_names)
+    setup_csrf(app)
+
+    return app
+

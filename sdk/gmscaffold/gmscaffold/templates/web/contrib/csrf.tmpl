@@ -1,0 +1,110 @@
+"""
+@文件        :csrf.py
+@说明        :{{ description }}
+@时间        :{{ date }}
+@作者        :{{ author }}
+@邮箱        :{{ email }}
+@版本        :{{ version }}
+"""
+
+import os
+from base64 import b64decode, b64encode
+from functools import wraps
+from inspect import isawaitable
+from typing import Any, Callable, Coroutine, Literal, Optional, Tuple, Union, cast
+
+from cryptography.fernet import Fernet, InvalidToken
+from sanic import HTTPResponse, Request, Sanic
+from sanic.exceptions import Forbidden
+
+from {{ name }}.core.cookie import set_cookie
+
+FuncT = Callable[..., Union[Coroutine[None, None, HTTPResponse], HTTPResponse]]
+
+
+class CSRFFailure(Forbidden):
+    message = "CSRF Failure. Missing or invalid CSRF token."
+    quiet = False
+
+
+def csrf_protected(func: FuncT) -> FuncT:
+    def decorator(f: FuncT) -> FuncT:
+        @wraps(f)
+        async def decorated_function(
+            request: Request, *args: Any, **kwargs: Any
+        ) -> HTTPResponse:
+
+            origin = request.headers.get("origin")
+            if request.ctx.from_browser and (
+                origin not in request.app.config.CORS_ORIGINS
+                or "browser_check" not in request.cookies
+                or not csrf_check(request)
+            ):
+                raise CSRFFailure
+
+            response = f(request, *args, **kwargs)
+            if isawaitable(response):
+                response = await response
+
+            return cast(HTTPResponse, response)
+
+        return cast(FuncT, decorated_function)
+
+    return decorator(func)
+
+
+def setup_csrf(app: Sanic) -> None:
+    @app.on_request
+    async def check_request(request: Request):
+        request.ctx.from_browser = (
+            "origin" in request.headers or "browser_check" in request.cookies
+        )
+
+    @app.on_response
+    async def mark_browser(_, response: HTTPResponse):
+        set_cookie(response=response, key="browser_check", value="1", httponly=True)
+
+
+def generate_csrf(secret: str, ref_length: int, padding: int) -> Tuple[str, str]:
+    cipher = Fernet(secret)
+    ref = os.urandom(ref_length)
+    pad = os.urandom(padding)
+    pretoken = cipher.encrypt(ref)
+
+    return ref.hex(), b64encode(pad + pretoken).decode("utf-8")
+
+
+def verify_csrf(
+    secret: str, padding: int, ref: Optional[str], token: Optional[str]
+) -> None:
+    if not ref or not token:
+        raise InvalidToken("Token is incorrect")
+
+    cipher = Fernet(secret)
+    raw = b64decode(token.encode("utf-8"))
+    pretoken = raw[padding:]
+    encoded_ref = cipher.decrypt(pretoken)
+
+    if ref != encoded_ref.hex():
+        raise InvalidToken("Token is incorrect")
+
+
+def csrf_check(request: Request) -> Literal[True]:
+    csrf_header = request.headers.get("x-xsrf-token")
+    csrf_cookie = request.get_cookies("csrf_token")
+    ref_token = request.get_cookies("ref_token")
+
+    try:
+        verify_csrf(
+            request.app.config.CSRF_SECRET,
+            request.app.config.CSRF_REF_PADDING,
+            ref_token,
+            csrf_cookie,
+        )
+    except InvalidToken as e:
+        raise CSRFFailure from e
+
+    if csrf_header != csrf_cookie:
+        raise CSRFFailure
+
+    return True

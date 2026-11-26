@@ -1,0 +1,56 @@
+"""
+@文件        :response.py
+@说明        :{{ description }}
+@时间        :{{ date }}
+@作者        :{{ author }}
+@邮箱        :{{ email }}
+@版本        :{{ version }}
+"""
+
+import asyncio
+from typing import Any
+
+from sanic.response import json
+from sanic import http
+
+from ..core.status_code import StatusCode, StatusCodeTemplate
+
+
+# TODO: 国际化
+@asyncio.coroutine
+def success(data=None):
+    """ """
+    return response(
+        StatusCode.OK,
+        StatusCodeTemplate.get_i18n_tmp(StatusCode.OK),
+        data,
+    )
+
+
+@asyncio.coroutine
+def fail(data=None):
+    """ """
+    return response(
+        StatusCode.INTERNAL_SERVER_ERROR,
+        StatusCodeTemplate.get_i18n_tmp(StatusCode.INTERNAL_SERVER_ERROR),
+        data,
+    )
+
+
+@asyncio.coroutine
+def unauthentication(data=None):
+    """ """
+    return response(
+        StatusCode.UNAUTHORIZED,
+        StatusCodeTemplate.get_i18n_tmp(StatusCode.UNAUTHORIZED),
+        data,
+    )
+
+
+@asyncio.coroutine
+def response(code: int | None = None, message: str | None = None, data: Any = None):
+    """ """
+    return json(
+        {"code": code, "msg": message, "result": data},
+        status=200,
+    )

@@ -1,0 +1,40 @@
+# -*- encoding: utf-8 -*-
+"""
+@文件        :i18n_const.py
+@说明        :{{ description }}
+@时间        :{{ date }}
+@作者        :{{ author }}
+@邮箱        :{{ email }}
+@版本        :{{ version }}
+"""
+import enum
+
+__all__ = [
+    "ModeType",
+]
+
+
+class ModeType(str, enum.Enum):
+    """ """
+
+    # Through the api interface of the script, the response format is unified.
+    API_MODE = "api"
+    # In special cases,
+    # external scripts are required to directly invoke the script by passing parameters,
+    # and the format of the response is adjusted according to the business scenario.
+    EX_MODE = "ex"
+
+
+class Language(str, enum.Enum):
+    """Language codes"""
+
+    EN = "en"
+    JA = "ja"
+    RU = "ru"
+    ZH_CN = "zh-CN"
+    ZH_TW = "zh-TW"
+
+    @classmethod
+    def values(cls):
+        """ """
+        return [x.value for x in cls.__members__.values()]

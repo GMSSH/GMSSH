@@ -1,0 +1,97 @@
+# -*- encoding: utf-8 -*-
+"""
+@文件        :wrapper.py
+@说明        :{{ description }}
+@时间        :{{ date }}
+@作者        :{{ author }}
+@邮箱        :{{ email }}
+@版本        :{{ version }}
+"""
+
+import asyncio
+import inspect
+from typing import Callable, Any, TypeVar, Coroutine
+from functools import wraps
+from inspect import isawaitable, signature
+
+from sanic import response
+
+T = TypeVar("T")
+
+
+def coroutine_run(func: Coroutine[Callable[[Any], Any], Any, None]) -> Any:
+    """ """
+
+    @wraps(func)
+    async def async_wrapper(*args, **kwargs):
+        return await func(*args, **kwargs)
+
+    def wrapper(*args, **kwargs):
+        if inspect.iscoroutinefunction(func):
+            return asyncio.run(async_wrapper(*args, **kwargs))
+        else:
+            return func(*args, **kwargs)
+
+    return wrapper
+
+
+def coroutine_wrapper(func: Callable[[Any], Any]) -> Any:
+    """ """
+    if inspect.iscoroutinefunction(func):
+        return func
+
+    @wraps(func)
+    async def async_wrapper(*args, **kwargs):
+        return func(*args, **kwargs)
+
+    @wraps(func)
+    def raw_wrapper(*args, **kwargs):
+        return func(*args, **kwargs)
+
+    def wrapper(*args, **kwargs):
+        if inspect.iscoroutinefunction(func):
+            return async_wrapper(*args, **kwargs)
+        else:
+            return raw_wrapper(*args, **kwargs)
+
+    return wrapper
+
+
+def serializer(func, *, status: int = 200) -> Callable[[T], T]:
+    sig = signature(func)
+    simple = len(sig.parameters) == 2 or (
+        func
+        in (
+            response.HTTPResponse,
+            response.file_stream,
+            response.file,
+            response.html,
+            response.json,
+            response.raw,
+            response.redirect,
+            response.text,
+        )
+    )
+
+    def decorator(f):
+
+        async def async_wrapper(func, *args, **kwargs):
+            if inspect.iscoroutinefunction(func):
+                return await func(*args, **kwargs)
+            return func(*args, **kwargs)
+
+        @wraps(f)
+        async def decorated_function(*args, **kwargs):
+            retval = f(*args, **kwargs)
+            if isawaitable(retval):
+                retval = await retval
+
+            if simple:
+                return await async_wrapper(func, retval, status=status)
+            else:
+                kwargs["status"] = status
+                return await async_wrapper(func, retval, *args, **kwargs)
+
+        return decorated_function
+
+    return decorator

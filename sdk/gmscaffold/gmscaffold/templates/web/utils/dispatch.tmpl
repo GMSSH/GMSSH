@@ -1,0 +1,245 @@
+"""
+@文件        :dispatch.py
+@说明        :{{ description }}
+@时间        :{{ date }}
+@作者        :{{ author }}
+@邮箱        :{{ email }}
+@版本        :{{ version }}
+"""
+from __future__ import annotations
+
+import asyncio
+import threading
+import time
+from abc import abstractmethod, ABCMeta
+from typing import List, Type, Set, Optional, Generic, TypeVar, Dict
+from dataclasses import dataclass
+from collections import defaultdict
+
+from sanic import Blueprint, Request, Websocket
+
+from {{ name }}.core.wrapper import coroutine_run
+
+T = TypeVar("T")
+
+
+@dataclass
+class MessageBody:
+    """ """
+
+    message: str
+
+
+@dataclass
+class Context:
+    """ """
+
+    ws: Websocket
+    message: str
+
+
+class SubjectAbstract(metaclass=ABCMeta):
+    """ """
+
+    @abstractmethod
+    def attach(self, observer: ObserverAbstract): ...
+    @abstractmethod
+    def detach(self, observer: ObserverAbstract): ...
+    @abstractmethod
+    def notify(self, message: MessageBody): ...
+    @abstractmethod
+    def get_observers(self, message: MessageBody): ...
+
+
+class ObserverAbstract(metaclass=ABCMeta):
+    """ """
+
+    @abstractmethod
+    def update(self, message: MessageBody): ...
+
+
+class ConcreteSubject(SubjectAbstract):
+    """ """
+
+    def __init__(self):
+        """ """
+        self._lock = threading.Lock()
+        self._observers: Set[ObserverAbstract] = set()
+
+    def attach(self, observer: ObserverAbstract):
+        """ """
+        with self._lock:
+            self._observers.add(observer)
+
+    def detach(self, observer: ObserverAbstract):
+        """ """
+        with self._lock:
+            self._observers.remove(observer)
+
+    def notify(self, message: MessageBody):
+        """ """
+        for observer in self._observers:
+            observer.update(message)
+
+    def get_observers(self) -> List[ObserverAbstract]:
+        """ """
+        return self._observers
+
+
+class ConcreteObserver(ObserverAbstract):
+    """ """
+
+    def __init__(self, uid: str):
+        """ """
+        self._uid = uid
+
+    def update(self, message: MessageBody):
+        """ """
+        print(f"[*] {self._uid}接受消息 >>> ", message.message)
+
+    def __eq__(self, value) -> bool:
+        """ """
+        return self._uid == value._uid
+
+    def __hash__(self):
+        hash_value = hash(self._uid)
+        return (hash_value ^ (hash_value >> 16)) & (2**64 - 1)
+
+
+class MessageExchanger(Generic[T]):
+    """ """
+
+    def __init__(self, dispatch: T):
+        """ """
+        self._lock = threading.Lock()
+        self._dispatch = dispatch
+        self._subjects = defaultdict(ConcreteSubject)
+
+    def get_topic_observers(self, topic: str) -> List[SubjectAbstract]:
+        """ """
+        with self._lock:
+            return self._subjects[topic].get_observers()
+
+    def on_event(self, topic: str, observer: SubjectAbstract):
+        """ """
+        with self._lock:
+            self._subjects[topic].attach(observer)
+            self.dispatch(topic)
+
+    def out_event(self, topic: str, observer: SubjectAbstract):
+        """ """
+        with self._lock:
+            self._subjects[topic].detach(observer)
+            if len(self.get_topic_observers(topic)) <= 0:
+                del self._subjects[topic]
+            self.leave_dispatch(topic)
+
+    def publish(self, topic: str, message: MessageBody):
+        """ """
+        self._subjects[topic].notify(message)
+
+    def notify_all(self, message: MessageBody):
+        """ """
+        for topic in self._subjects:
+            self.publish(topic, message)
+
+    def auto_dispatch(self, message: MessageBody):
+        """ """
+        for topic in self._subjects:
+            self.dispatch(topic, message)
+
+    def leave_dispatch(self, topic: str):
+        """ """
+        self._dispatch.leave_dispatch(topic)
+
+    def dispatch(self, topic: str, context: Optional[Context] = None):
+        """ """
+        observers = self.get_topic_observers(topic)
+        if len(observers) <= 0:
+            return
+        self._dispatch.enter_dispatch(topic, context)
+
+
+class DispatchAbstract(metaclass=ABCMeta):
+    """ """
+
+    @abstractmethod
+    def enter_dispatch(self, *args, **kwargs):
+        """ """
+
+    @abstractmethod
+    def leave_dispatch(self, *args, **kwargs): ...
+
+    @abstractmethod
+    def send_message(self, *args, **kwargs): ...
+
+
+class Publisher(metaclass=ABCMeta):
+    """ """
+
+    @abstractmethod
+    def quit(self): ...
+    @abstractmethod
+    def run(self): ...
+    @abstractmethod
+    def start(self): ...
+    @abstractmethod
+    def from_dispatcher(cls, topic: str, exchanger: DispatchAbstract): ...
+
+
+
+class WebsocketDispatcher(DispatchAbstract):
+    """ """
+
+    def __init__(self, socket: Websocket):
+        """ """
+        self._socket = socket
+        self._lock = threading.Lock()
+        self._handlers: Dict[str, Publisher] = {}
+
+    def register(self, topic: str, dispatch: Publisher):
+        """ """
+        with self._lock:
+            dispatcher = dispatch.from_dispatcher(topic, self)
+            self._handlers[topic] = dispatcher
+
+    def unregister(self, topic: str):
+        """ """
+        with self._lock:
+            self._handlers.pop(topic, None)
+
+    def get_dispatch(self, topic: str, erase=False):
+        """ """
+        with self._lock:
+            if not erase:
+                return self._handlers.get(topic, None)
+            else:
+                return self._handlers.pop(topic, None)
+
+    def enter_dispatch(self, topic: str, context: Context = None):
+        """ """
+        dispatcher = self.get_dispatch(topic, erase=False)
+        if not dispatcher:
+            return
+        dispatcher.start()
+
+    def leave_dispatch(self, topic: str):
+        """ """
+        handler = self.get_dispatch(topic, erase=True)
+        if not handler:
+            return
+        handler.quit()
+
+    async def send_message(self, message: str):
+        """ """
+        try:
+            await self._socket.send(message)
+        except Exception as _:
+            #: 自行记录日志
+            pass
+
+
+class EventType:
+    """ """
+
+

@@ -1,0 +1,37 @@
+"""
+@文件        :item.py
+@说明        :{{ description }}
+@时间        :{{ date }}
+@作者        :{{ author }}
+@邮箱        :{{ email }}
+@版本        :{{ version }}
+"""
+
+from dataclasses import dataclass, asdict
+
+from {{ name }}.app.interfaces.item import BaseItem
+
+# 自定义数据案例
+# TODO: 自行参考实现
+
+@dataclass
+class DomainItem(BaseItem):
+    """域名字段成员
+
+    该对象就是处理和解析最终需要的字段
+    假设域名成语属性包含如下：
+    1. name: 域名名称
+    2. price: 域名价格
+    3. description: 描述
+    4. category: 所属类目
+    5. start_date: 开始时间
+    6. end_date: 结束时间
+    等等
+    """
+
+    name: str
+    price: float
+    description: str
+    category: str
+    start_date: str
+    end_date: str

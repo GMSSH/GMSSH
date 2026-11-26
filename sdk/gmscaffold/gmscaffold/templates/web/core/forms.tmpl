@@ -1,0 +1,1469 @@
+# -*- encoding: utf-8 -*-
+"""
+@文件        :forms.py
+@说明        :{{ description }}
+@时间        :{{ date }}
+@作者        :{{ author }}
+@邮箱        :{{ email }}
+@版本        :{{ version }}
+"""
+
+import inspect
+import re
+from abc import ABCMeta, abstractmethod
+from collections import ChainMap
+from copy import deepcopy
+
+from .strconv import str2int
+from .i18n import T as i18n
+from .types import (
+    Generic,
+    List,
+    Any,
+    Dict,
+    FDV,
+    T,
+    FMV,
+    Type,
+    cast,
+    Tuple,
+    NoReturn,
+    _VT,
+    _KT,
+)
+from zack.core.exceptions import *
+
+__all__ = [
+    "NoValue",
+    "BaseField",
+    "Field",
+    "StringField",
+    "StringRegexField",
+    "BooleanField",
+    "IntegerField",
+    "ListField",
+    "DictField",
+    "RangeField",
+    "NoValueField",
+    "IntRangeField",
+    "PortField",
+    "LengthLimitField",
+    "StringRegexLimitField",
+    "nan",
+    "IntegerLimitField",
+    "StringValueLimitField",
+    "StringLengthLimitField",
+    "StringRangField",
+    "IntegerRangeField",
+    "Typed",
+    "FieldBase",
+    "DefaultRuler",
+    "RequiredRuler",
+    "RequiredUnlessRuler",
+    "RequiredIfRuler",
+    "RequiredWithRuler",
+    "RequiredWithoutRuler",
+    "DefaultRuleBuilder",
+    "RuleControllerBase",
+    "SimpleRuleController",
+    "Form",
+    "ValidatorStrategy",
+    "Validator",
+    "BooleanValidator",
+    "RequireValidator",
+    "StrictPasswordValidator",
+    "BaseForm",
+    "BaseUserForm",
+]
+
+
+# Getting the file creation time This class is used to verify that the data is valid
+class NoValue: ...
+
+
+def make_signature(fields: List[Any]):
+    """
+    The function `make_signature` creates a signature object for a function based on a list of field
+    names.
+
+    :param fields: A list of any type of objects
+    :type fields: List[Any]
+    :return: an instance of the `inspect.Signature` class.
+    """
+    """ """
+    params = []
+    for name, required in fields:
+        if required:
+            params.append(inspect.Parameter(name, inspect.Parameter.KEYWORD_ONLY))
+        else:
+            params.append(
+                inspect.Parameter(name, inspect.Parameter.KEYWORD_ONLY, default=None)
+            )
+    return inspect.Signature(params)
+
+
+# +--------------------------------------------------
+# Field
+# +--------------------------------------------------
+class BaseField(Generic[FDV, T, FMV]):
+    """ """
+
+    value = None
+
+    def __init__(
+        self,
+        validators: List["Validator"] = None,
+        err_msg: str = "",
+        default: Type[T] = None,
+        valid: str = "",
+    ) -> None:
+        """
+        The above function is a constructor that initializes the instance variables `_validators`, `name`,
+        and `err_msg`.
+
+        :param validators: The `validators` parameter is a list of functions that will be used to validate
+        the input. Each function should take a single argument (the input value) and return `True` if the
+        value is valid, or `False` otherwise. By default, if no validators are provided, an empty list
+        :param err_msg: The `err_msg` parameter is a string that represents the error message that will be
+        displayed if any of the validators fail
+        """
+        if validators is None:
+            validators = []
+        self._validators: List["Validator"] = list(validators)
+        self.name: str = None
+        self.err_msg: str = err_msg
+        self.default: Type[T] = default
+        self.valid: str = valid
+
+    @abstractmethod
+    def validator(self, value: Type[T]) -> T:
+        """ """
+        raise NotImplementedError
+
+    def get_validators(self):
+        """
+        The function returns the validators associated with an object.
+        :return: The method is returning the value of the variable `self._validators`.
+        """
+        return self._validators
+
+    def required(self):
+        """
+        The function checks if any of the validators in a list have the "require" attribute set to True.
+        :return: The code is returning a boolean value indicating whether any of the validators in the
+        `_validators` list have the `require` attribute set to `True`.
+        """
+        return any((v.require for v in self._validators))
+
+    required = property(required)
+
+
+class Field(BaseField[FDV, T, FMV]):
+    """
+    The `Field` class is a descriptor that sets a value for an attribute in an instance, checks if the
+    value is of the expected type, and cleans the data using a list of validators.
+    """
+
+    expected_type = None
+    _attr = ["name", "value", "instance"]
+
+    def _get_value(self, value):
+        """Get the value"""
+        if self.default is None:
+            return value
+        return value or self.default
+
+    def __set__(self, instance: Type[FMV], value: Type[T], *args, **kw):
+        """
+        The function sets a value for an attribute in an instance, checking if the value is of the expected
+        type and cleaning the data.
+
+        :param instance: The `instance` parameter refers to the instance of the class that the descriptor is
+        being accessed from. It represents the object on which the descriptor is being used
+        :param value: The `value` parameter represents the value that is being assigned to the attribute
+        """
+        if self.expected_type is not NoValue and not isinstance(
+            value, self.expected_type
+        ):
+            raise TypeError(
+                i18n.translate_ctx(
+                    "GM_VALUE_EXPECTED_TM", self.name, self.expected_type.__name__
+                )
+            )
+
+        try:
+            if isinstance(value, bool):
+                _value = self._get_value(value)
+                value: Type[T] = self.validator(_value) or value
+            else:
+                value: Type[T] = self._get_value(self.validator(self._get_value(value)))
+        except NotImplementedError:
+            pass
+        except Exception as e:
+            raise FieldValidateError(str(e)) from e
+        self.clean_data(instance, value)
+
+    def validator(self, value: type[T]) -> T:
+        """ """
+        return value
+
+    def clean_data(self, instance: Type[FMV], value: Type[T]):
+        """
+        The `clean_data` function iterates through a list of validators, sets the necessary attributes for
+        each validator, and then calls the `clean` method of each validator to validate the data.
+
+        :param instance: The `instance` parameter refers to an instance of a class or object that contains
+        the data to be cleaned. It is likely that this method is part of a larger class or form validation
+        system
+        :param value: The `value` parameter represents the value that needs to be cleaned. It is passed to
+        the `clean_data` method as an argument
+        """
+        for validator in self._validators:
+            err_dict = {}
+            for __k, __v in zip(self._attr, [self.name, value, instance]):
+                validator.__dict__[__k] = __v
+            try:
+                validator.clean(instance)
+            except FieldValidateError as e:
+                err_dict["msg"] = e.message
+                err_dict["code"] = e.status_code
+                instance.code = e.status_code
+                instance.errors.append(err_dict)
+            except Exception as e:
+                err_dict["msg"] = self.err_msg or e
+                instance.errors.append(err_dict)
+        instance.__dict__[self.name] = value
+        self.value = value
+
+    def __delete__(self, instance):
+        """ """
+        del instance.__dict__[self.name]
+
+
+class StringField(Field[FDV, T, FMV]):
+    """ """
+
+    expected_type = str
+
+
+class StringIdentifierField(StringField[FDV, T, FMV]):
+    """ """
+
+    def __init__(
+        self,
+        validators: List["Validator"] = None,
+        err_msg: str = "",
+        default: type[T] = None,
+        max_len=25,
+        min_len=1,
+        valid: str = "",
+    ) -> None:
+        self.max_len = max_len
+        self.min_len = min_len
+        super().__init__(validators, err_msg, default, valid)
+
+    def validator(self, value: type):
+        """ """
+        pattern = r"^[a-zA-Z].[a-z0-9A-Z_/]+"
+        if not isinstance(value, str):
+            """ """
+            raise FieldValidateError(
+                i18n.translate_ctx("GM_VALUE_MISSING_FORM_TM", self.name)
+            )
+
+        if value in [None, ""]:
+            raise FieldValidateError(
+                i18n.translate_ctx("GM_VALUE_MISSING_FORM_TM", self.name)
+            )
+
+        if not re.match(pattern, value):
+            raise FieldValidateError(
+                i18n.translate_ctx("GM_VALUE_MISSING_FORM_TM", self.name)
+            )
+
+        if len(value) < self.min_len or len(value) > self.max_len:
+            """ """
+            raise FieldValidateError(
+                i18n.translate_ctx(
+                    "GM_VALUE_RANGE_FORM_TM",
+                    self.name,
+                    self.min_len,
+                    self.max_len,
+                )
+            )
+
+        return value
+
+
+class StringRegexField(StringField[FDV, T, FMV]):
+    """ """
+
+    def __init__(
+        self,
+        validators: List["Validator"] = None,
+        err_msg: str = "",
+        regex=None,
+        default: Type[T] = None,
+        valid: str = "",
+    ) -> None:
+        """ """
+        self.regex = regex
+        super().__init__(validators, err_msg, default, valid=valid)
+
+    def validator(self, value: type):
+        """ """
+        if value in [None, ""]:
+            return
+
+        if self.regex is None:
+            return
+
+        if not re.match(self.regex, value):
+            raise FieldValidateError(
+                i18n.translate_ctx("GM_VALUE_MISSING_FORM_TM", self.name)
+            )
+        return value
+
+
+class BooleanField(Field[FDV, T, FMV]):
+    """ """
+
+    expected_type = bool
+
+
+class IntegerField(Field[FDV, T, FMV]):
+    """ """
+
+    expected_type = int
+
+
+class ListField(Field[FDV, T, FMV]):
+    """ """
+
+    expected_type = list
+
+
+class DictField(Field[FDV, T, FMV]):
+    """ """
+
+    expected_type = dict
+
+
+class NoValueField(Field[FDV, T, FMV]):
+    """ """
+
+    expected_type = NoValue
+
+
+class RangeField(Field[FDV, T, FMV]):
+    """ """
+
+    ALLOW = []
+
+    def __init__(
+        self,
+        validators: List["Validator"] = None,
+        err_msg: str = "",
+        allow=None,
+        default: Type[T] = None,
+        valid: str = "",
+    ) -> None:
+        """ """
+
+        if allow is None:
+            allow = []
+        self.ALLOW = allow or self.ALLOW
+        super().__init__(validators, err_msg, default, valid=valid)
+
+    def validator(self, value: type):
+        """ """
+        if value in [None, ""]:
+            return
+        if value not in self.ALLOW:
+            raise FieldValidateError(
+                i18n.translate_ctx(
+                    "GM_VALUE_LIST_RANGE_FORM_TM", self.name, str(self.ALLOW)
+                )
+            )
+        return value
+
+
+class StrRangeField(RangeField[FDV, T, FMV], StringField[FDV, T, FMV]): ...
+
+
+class IntRangeField(RangeField[FDV, T, FMV], IntegerField[FDV, T, FMV]): ...
+
+
+class PortField(Field[FDV, T, FMV]):
+    """ """
+
+    MIN = 1
+    MAX = 65535
+    expected_type = NoValue
+
+    def __init__(
+        self,
+        validators: List["Validator"] = None,
+        min_value=1,
+        max_value=65535,
+        err_msg: str = "",
+        default: type[T] = None,
+        valid: str = "",
+    ) -> None:
+        """ """
+        super().__init__(validators, err_msg, default, valid=valid)
+        self.min_value = min_value or self.MIN
+        self.max_value = max_value or self.MAX
+
+    def validator(self, value: type[T]) -> T:
+        """ """
+        if value in [None, ""]:
+            return
+        if isinstance(value, str):
+            """ """
+            value = cast(str, value)
+            if not value.isdigit():
+                raise FieldValidateError(
+                    i18n.translate_ctx("GM_VALUE_PORT_FORM_TM", value)
+                )
+            port = int(value)
+        elif isinstance(value, int):
+            port = value
+        else:
+            raise FieldValidateError(
+                i18n.translate_ctx("GM_VALUE_PORT_EXPECTED_TM", value)
+            )
+        if port < self.min_value or port > self.max_value:
+            raise FieldValidateError(
+                i18n.translate_ctx("GM_VALUE_PORT_RANGE_FORM_TM", value)
+            )
+        return value
+
+
+class LengthLimitField(StringField[FDV, T, FMV], Field[FDV, T, FMV]):
+    """ """
+
+    MIN_LENGTH = 0
+    MAX_LENGTH = 32
+
+    def __init__(
+        self,
+        validators: List["Validator"] = None,
+        min_length=0,
+        max_length=32,
+        err_msg: str = "",
+        default: type[T] = None,
+        valid: str = "",
+    ) -> None:
+        """ """
+        super().__init__(validators, err_msg, default, valid=valid)
+        self.min_length = min_length or self.MIN_LENGTH
+        self.max_length = max_length or self.MAX_LENGTH
+
+    def validator(self, value: type):
+        """ """
+        if value in [None, ""]:
+            return
+        if len(value) < self.min_length or len(value) > self.max_length:
+            raise FieldValidateError(
+                i18n.translate_ctx(
+                    "GM_VALUE_RANGE_FORM_TM",
+                    self.name,
+                    self.min_length,
+                    self.max_length,
+                )
+            )
+        return value
+
+
+class StringRegexLimitField(StringField[FDV, T, FMV]):
+    """ """
+
+    def __init__(
+        self,
+        validators: List["Validator"] = None,
+        min_length=0,
+        max_length=32,
+        err_msg: str = "",
+        default: type[T] = None,
+        regex=None,
+        valid: str = "",
+    ) -> None:
+        """ """
+        super().__init__(validators, err_msg, default, valid=valid)
+        self._str_limit_field = LengthLimitField(
+            validators=validators, min_length=min_length, max_length=max_length
+        )
+        self._str_regex_field = StringRegexField(validators=validators, regex=regex)
+
+    def validator(self, value: type[T]) -> T:
+        """ """
+        self._str_limit_field.validator(value)
+        self._str_regex_field.validator(value)
+        return value
+
+
+class nan:
+    """ """
+
+    def __str__(self) -> str:
+        """ """
+        return self.__class__.__name__
+
+    def __repr__(self) -> str:
+        """ """
+        return self.__class__.__name__
+
+
+class IntegerLimitField(IntegerField[FDV, T, FMV]):
+    """ """
+
+    MIN = 0
+    MAX = 100
+
+    def __init__(
+        self,
+        validators: List["Validator"] = None,
+        min_value=0,
+        max_value=32,
+        err_msg: str = "",
+        default: type[T] = None,
+        valid: str = "",
+    ) -> None:
+        """ """
+        super().__init__(validators, err_msg, default, valid=valid)
+        self.min_value = min_value or self.MIN
+        self.max_value = max_value or self.MAX
+
+    def validator(self, value: type):
+        """
+        Validate the input value against the minimum and maximum values.
+
+        Args:
+            value (type): The value to be validated.
+
+        Raises:
+            FormValidateError: If the value is not within the specified range.
+        """
+        if value in [None, ""]:
+            return
+
+        if self.min_value is nan and self.max_value is nan:
+            """ """
+            return
+
+        if self.min_value is nan and value > self.max_value:
+            """ """
+            tmp = i18n.translate_ctx(
+                "GM_VALUE_INT_FORM_TM", self.name, self.min_value, self.max_value
+            )
+            raise FieldValidateError(tmp)
+
+        if self.max_value is nan and value < self.min_value:
+            """ """
+            tmp = i18n.translate_ctx(
+                "GM_VALUE_INT_FORM_TM", self.name, self.min_value, self.max_value
+            )
+            raise FieldValidateError(tmp)
+
+        if self.min_value is nan and self.max_value is nan:
+            tmp = i18n.translate_ctx(
+                "GM_VALUE_INT_FORM_TM", self.name, self.min_value, self.max_value
+            )
+            raise FieldValidateError(tmp)
+        return value
+
+
+class StringValueLimitField(StringField[FDV, T, FMV]):
+    """ """
+
+    def __init__(
+        self,
+        validators: List["Validator"] = None,
+        min_value=nan,
+        max_value=nan,
+        err_msg: str = "",
+        default: type[T] = None,
+        valid: str = "",
+    ) -> None:
+        """ """
+        super().__init__(validators, err_msg, default, valid=valid)
+        self.min_value = min_value
+        self.max_value = max_value
+
+    def validator(self, value: type):
+        """Validate"""
+
+        if value in [None, ""]:
+            return
+
+        if self.min_value is nan and self.max_value is nan:
+            """ """
+            return
+
+        if isinstance(value, str):
+            value_int = str2int(value)
+        else:
+            value_int = value
+
+        if self.min_value is nan:
+            """ """
+            max_value = str2int(self.max_value)
+            if value_int > max_value:
+                tmp = i18n.translate_ctx(
+                    "GM_VALUE_INT_FORM_TM", self.name, self.min_value, self.max_value
+                )
+                raise FieldValidateError(tmp)
+            return
+
+        if self.max_value is nan:
+            """ """
+            min_value = str2int(self.min_value)
+            if value_int < min_value:
+                tmp = i18n.translate_ctx(
+                    "GM_VALUE_INT_FORM_TM", self.name, self.min_value, self.max_value
+                )
+                raise FieldValidateError(tmp)
+            return
+
+        max_value = str2int(self.max_value)
+        min_value = str2int(self.min_value)
+        if value_int < self.min_value or value_int > self.max_value:
+            tmp = i18n.translate_ctx(
+                "GM_VALUE_INT_FORM_TM", self.name, self.min_value, self.max_value
+            )
+            raise FieldValidateError(tmp)
+        return value
+
+
+class StringLengthLimitField(LengthLimitField[FDV, T, FMV]):
+    """ """
+
+
+class StringRangField(StrRangeField[FDV, T, FMV]):
+    """ """
+
+
+class IntegerRangeField(IntRangeField[FDV, T, FMV]):
+    """ """
+
+
+# +--------------------------------------------------
+# Field function enhancement
+# Beware of unfamiliar advice
+# +--------------------------------------------------
+# Decorator for applying type checking
+def Typed(expected_type, cls=None):
+    """ Performance is better than pure inheritance  
+    
+    # --------------------------------
+    Usage example:
+    
+    class IntegerField(Field[FDV, T, FMV]):
+        """ """
+        expected_type = int
+        
+    # Custom Unsigned :Reference Typed
+    # Decorator for unsigned values
+    def Unsigned(cls):
+        super_set = cls.__set__
+
+        def __set__(self, instance, value):
+            if value < 0:
+                raise ValueError('Expected >= 0')
+            super_set(self, instance, value)
+
+        cls.__set__ = __set__
+        return cls
+        
+    @Unsigned
+    class UnsignedInteger(IntegerField):
+        pass
+    
+    # Use
+    class Personal:
+        """ """
+        age = UnsignedInteger()
+    # --------------------------------
+    """
+    if cls is None:
+        return lambda cls: Typed(expected_type, cls)
+    super_set = cls.__set__
+
+    def __set__(self, instance, value):
+        """ """
+        if not isinstance(value, expected_type):
+            raise TypeError(
+                i18n.translate_ctx(
+                    "GM_VALUE_EXPECTED_TM", cls.name, expected_type.__name__
+                )
+            )
+        super_set(self, instance, value)
+
+    cls.__set__ = __set__
+    return cls
+
+
+# +--------------------------------------------------
+# Form of field
+# +--------------------------------------------------
+class FieldBase:
+    """ """
+
+    def __init__(self, name: str, field: BaseField, value: Any = None) -> None:
+        """ """
+        self.name = name
+        self._field = field
+        self._value = value
+
+    def get_name(self):
+        """ """
+        return self.name
+
+    def get_value(self):
+        """ """
+        return self._value
+
+    def get_field(self):
+        """ """
+        return self._field
+
+    def get_field_validator(self):
+        """ """
+        return self._field.valid
+
+    @abstractmethod
+    def accept(self, visitor: "FieldRuler"): ...
+
+
+class SimpleFieldRule(FieldBase):
+    """ """
+
+    def accept(self, visitor: "FieldRuler"):
+        return visitor.check(self)
+
+
+# visitor
+class FieldRuler:
+    """ """
+
+    RULE: str
+
+    def __init__(self, controller: "RuleControllerBase") -> None:
+        """ """
+        self._controller = controller
+
+    @abstractmethod
+    def check(self, rule: FieldBase):
+        """ """
+
+    def get_kwds(self):
+        """ """
+        return self._controller.get_kwds()
+
+    def express_eval(self, field_info_list: List):
+        """ """
+        kwd = {}
+        for i in range(0, len(field_info_list), 2):
+            first_value = field_info_list[i]
+            second_value = (
+                field_info_list[i + 1] if i + 1 < len(field_info_list) else None
+            )
+            if not second_value:
+                continue
+            kwd[first_value] = second_value
+        return kwd
+
+    def make_condition(self, rule: FieldBase) -> Dict[str, Any] | List[Any]:
+        """ """
+        validator = rule.get_field_validator()
+        _, field_infos = validator.split(":")
+        field_info_list = field_infos.split(",")
+        kwd = self.express_eval(field_info_list)
+        return kwd
+
+
+class DefaultRuler(FieldRuler):
+    """ """
+
+    def check(self, rule: FieldBase): ...
+
+
+class RequiredRuler(FieldRuler):
+    """ """
+
+    def check(self, rule: FieldBase):
+        return
+
+
+class RequiredIfRuler(FieldRuler):
+    """
+    Rule: required if: field, value
+    Description: Required parameter (when any given field value is equal to the given value, i.e. when the value of the field field is value, the current validation field is a required parameter). Multiple fields are separated by asterisks.
+    Example: When the Gender field is 1, the WifeName field must not be empty, and when the Gender field is 2, the HusbandName field must not be empty.
+    """
+
+    RULE: str = "required-if"
+
+    # required-if:gender,1
+    def check(self, rule: FieldBase):
+        """ """
+        name = rule.get_name()
+        kwd_cond = self.make_condition(rule)
+        kwds = self.get_kwds()
+
+        flag = False
+        for _k, _v in kwd_cond.items():
+            """ """
+            if _k not in kwds:
+                continue
+            if str(kwds[_k]) != str(_v):
+                continue
+            flag = True
+
+        if flag and not kwds.get(name):
+            """ """
+            raise FieldTypeError(i18n.translate_ctx("GM_VALUE_MISSING_FORM_TM", name))
+
+
+class RequiredUnlessRuler(FieldRuler):
+    """
+    Rule: required uncles: field, value
+    Description: Required parameter (when the given field value is not equal to the given value, i.e. when the value of the field field is not value, the current validation field is a required parameter). Multiple fields are separated by asterisks.
+    Example: When Gender is not equal to 0 and Gender is not equal to 2, WifeName must not be empty; When Id is not equal to 0 and Gender is not equal to 2, HusbandName must not be empty.
+    """
+
+    RULE: str = "required-unless"
+
+    def check(self, rule: FieldBase):
+
+        name = rule.get_name()
+        kwd_cond = self.make_condition(rule)
+        kwds = self.get_kwds()
+
+        flag = False
+        for _k, _v in kwd_cond.items():
+            """ """
+            if _k not in kwds:
+                continue
+            if str(kwds[_k]) == str(_v):
+                continue
+            flag = True
+
+        if flag and not kwds.get(name):
+            """ """
+            raise FieldTypeError(i18n.translate_ctx("GM_VALUE_MISSING_FORM_TM", name))
+
+
+class RequiredWithRuler(FieldRuler):
+    """
+    Rule: required with: field1, field2
+    Description: Required parameter (when one of the given field values is not empty).
+    Example: When WifeName is not empty, HusbandName must not be empty.
+    """
+
+    RULE: str = "required-with"
+
+    # required-with:WifeName
+
+    def make_condition(self, rule):
+        """ """
+        validator = rule.get_field_validator()
+        _, field_infos = validator.split(":")
+        field_info_list = field_infos.split(",")
+        return field_info_list
+
+    def check(self, rule: FieldBase):
+        """ """
+
+        name = rule.get_name()
+        kwd_cond = self.make_condition(rule)
+        kwds = self.get_kwds()
+
+        flag = False
+        for _v in kwd_cond:
+            """ """
+            if _v in kwds and kwds.get(_v) in [None, ""]:
+                continue
+            flag = True
+
+        if flag and not kwds.get(name):
+            """ """
+            raise FieldTypeError(i18n.translate_ctx("GM_VALUE_MISSING_FORM_TM", name))
+
+
+class RequiredWithoutRuler(FieldRuler):
+    """
+    Rule: required without: field1, field2,...
+    Description: Required parameter (when one of the given field values is empty).
+    Example: When Id or WifeName is empty, HusbandName must not be empty.
+    """
+
+    # required-without:WifeName
+    RULE: str = "required-without"
+
+    def make_condition(self, rule):
+        """ """
+        validator = rule.get_field_validator()
+        _, field_infos = validator.split(":")
+        field_info_list = field_infos.split(",")
+        return field_info_list
+
+    def check(self, rule: FieldBase):
+
+        name = rule.get_name()
+        kwd_cond = self.make_condition(rule)
+        kwds = self.get_kwds()
+
+        flag = False
+        for _v in kwd_cond:
+            """ """
+            if _v in kwds and kwds.get(_v) not in [None, ""]:
+                continue
+            flag = True
+
+        if flag and not kwds.get(name):
+            """ """
+            raise FieldTypeError(i18n.translate_ctx("GM_VALUE_MISSING_FORM_TM", name))
+
+
+class BaseRuleBuilder:
+    """ """
+
+
+class DefaultRuleBuilder(BaseRuleBuilder):
+    """ """
+
+    def __init__(self, rule: FieldBase) -> None:
+        """ """
+        self.rules = []
+        self._rule = rule
+
+    def then(self, ruler: FieldRuler):
+        """ """
+        self.rules.append(ruler)
+
+    def when(self, rule: FieldBase):
+        """ """
+        return DefaultRuleBuilder(rule)
+
+    def combine(self, rule_builder: BaseRuleBuilder):
+        """ """
+        self.rules.extend(rule_builder.rules)
+
+    def evaluate(self):
+        """ """
+        for rule in self.rules:
+            rule.check(self._rule)
+
+
+class RuleControllerBase(metaclass=ABCMeta):
+    """ """
+
+    @abstractmethod
+    def get_kwds(self) -> Dict[str, Any]: ...
+
+    @abstractmethod
+    def get_fields(self) -> List[Tuple[str, Field]]: ...
+
+    @abstractmethod
+    def evaluate(self): ...
+
+
+class SimpleRuleController(RuleControllerBase):
+    """ """
+
+    RULE_OP = {
+        "required": RequiredRuler,
+        "required_if": RequiredIfRuler,
+        "required_unless": RequiredUnlessRuler,
+        "required_without": RequiredWithoutRuler,
+        "required_with": RequiredWithRuler,
+        "default": DefaultRuler,
+    }
+
+    def __init__(self, kwds: Dict[str, Any], fields: List[Tuple[str, Field]]) -> None:
+        """ """
+        self._kwds = kwds
+        self._fields = fields
+
+    def get_kwds(self):
+        """ """
+        return self._kwds
+
+    def get_fields(self):
+        """ """
+        return self._fields
+
+    def attach_op(self, express: Dict[str, Any]):
+        """ """
+        self.RULE_OP.update(express)
+
+    def build(self):
+        """ """
+        for name, field in self._fields:
+            value = self._kwds.get(name)
+            rule_builder = DefaultRuleBuilder(SimpleFieldRule(name, field, value))
+            validator_prefix = field.valid.split(":", maxsplit=1)[0]
+            rule_operator = self.RULE_OP.get(
+                validator_prefix.replace("-", "_"), DefaultRuler
+            )
+            rule_builder.then(rule_operator(self))
+            yield rule_builder
+
+    def evaluate(self):
+        """ """
+        for builder in self.build():
+            builder.evaluate()
+
+
+# +--------------------------------------------------
+# Form
+# +--------------------------------------------------
+class from_meta(type):
+    """ """
+
+    def __new__(cls, classname, bases, methods: Dict[str, Any]):
+        """
+        The function dynamically creates a new class with a custom signature based on the fields defined in
+        the class methods.
+
+        :param cls: The `cls` parameter refers to the class object that is being created. It is a reference
+        to the metaclass itself
+        :param classname: The `classname` parameter is the name of the class being created
+        :param bases: The `bases` parameter is a tuple of the base classes that the new class inherits from
+        :param methods: The `methods` parameter is a dictionary that contains the methods and attributes of
+        the class being created. Each key-value pair in the dictionary represents a method or attribute,
+        where the key is the name of the method or attribute, and the value is the actual method or
+        attribute object
+        :type methods: Dict[str, Any]
+        :return: The `__new__` method is returning a new instance of the class.
+        """
+
+        parent_attributes = {}
+        for base in bases:
+            parent_attributes |= base.__dict__
+
+        for attr in parent_attributes:
+            """Get the attribute"""
+            if attr in methods:
+                continue
+            methods[attr] = parent_attributes[attr]
+
+        _fields, fields_, _kw_default = [], [], {}
+        for key, value in methods.items():
+            if isinstance(value, BaseField):
+                fields_.append((key, value))
+                _fields.append((key, value.required))
+                value.name = key
+                if value.default is None:
+                    continue
+                _kw_default[key] = value.default
+        methods["__kw_default__"] = _kw_default
+        methods["__fields__"] = fields_
+        methods["__signature__"] = make_signature(_fields)
+        return super().__new__(cls, classname, bases, methods)
+
+    def __call__(cls, *args: Any, **kwds: Any) -> Any:
+        """New verification rule extension"""
+
+        obj = object.__new__(cls)
+        cls.__init__(obj, *args, **kwds)
+        rule_cls = SimpleRuleController
+        if hasattr(obj, "rule_adapter"):
+            """ """
+            rule_cls = (
+                obj.rule_adapter
+                if obj.rule_adapter is not None
+                else SimpleRuleController
+            )
+        src = rule_cls(kwds=kwds, fields=obj.__fields__)
+        src.evaluate()
+        return obj
+
+
+class Form(metaclass=from_meta):
+    """
+    The above code defines a class with methods for initializing an object, representing the object as a
+    string, checking if the object is valid, and raising exceptions if the object is not valid.
+
+    Use the parameters from form data as input parameters
+    """
+
+    rule_adapter: "RuleControllerBase" = None
+
+    SUPER_NUM = 2
+
+    def __init__(self, *args, **kw) -> None:
+        """The function initializes an object by binding arguments to its attributes."""
+        self.errors = []
+        self.code = None
+        kw_cp = deepcopy(kw)
+
+        if is_super := self.__is_bases():
+            __sig_args = self.__get_bases_sig_args()
+        else:
+            __sig_args = self.__get_sig_args()
+        kwargs = {k: kw_cp[k] for k in kw_cp if k in __sig_args}
+
+        self._valid_attr = {}
+        try:
+            bound_values = self.__signature__.bind(
+                *args, **ChainMap(kwargs, self.__kw_default__)
+            )
+        except Exception as e:
+            # TODO: 国际化
+            raise FieldTypeError(str(e)) from e
+        for name, value in bound_values.arguments.items():
+            setattr(self, name, value)
+            self._valid_attr[name] = self.__dict__.get("files") or value
+
+    def __get_sig_args(self) -> Type[set]:
+        """
+        The function __get_sig_args returns a set of all the arguments and keyword-only arguments of the
+        current class.
+        :return: a set of all the arguments and keyword-only arguments of the class method.
+        """
+
+        __class = type(self)
+        prepare_bind_args = inspect.getfullargspec(__class)
+        return set(prepare_bind_args.args.__add__(prepare_bind_args.kwonlyargs))
+
+    def __get_bases_sig_args(self) -> Type[set]:
+        """
+        The function `__get_bases_sig_args` returns a set of all the argument names from the base classes of
+        the current class.
+        :return: a set of signature arguments (__sig_args) that are obtained by iterating over the base
+        classes of the current class (__bases) and adding the arguments from each base class to the set.
+        """
+        __bases = inspect.getmro(self.__class__)
+        __sig_args = set()
+        for __cls in __bases:
+            """ """
+            if __cls.__name__ in [Form.__name__, object.__name__]:
+                continue
+            __bind_args = inspect.getfullargspec(__cls)
+            __sig_args = __sig_args.union(
+                set(__bind_args.args.__add__(__bind_args.kwonlyargs))
+            )
+
+        return __sig_args
+
+    def __is_bases(self) -> bool:
+        """
+        The function checks if the number of base classes of an object is greater than a specified number.
+        :return: a boolean value indicating whether the number of classes in the method resolution order
+        (MRO) of the current class is greater than the value of `self.SUPER_NUM`.
+        """
+
+        return len(inspect.getmro(self.__class__)) > self.SUPER_NUM
+
+    def __repr__(self) -> str:
+        """ """
+        f_str = "".join(
+            f"{__name}={self.__dict__.get(__name)},"
+            for __name in self.__signature__.parameters.keys()
+        )
+        return f"<(class={self.__class__.__name__}, args:{f_str})>"
+
+    def is_valid(self) -> bool:
+        """
+        The function `is_valid` returns True if there are no errors, and the function `get_errors` returns
+        the value of the attribute "errors".
+        :return: The method `get_errors` is returning the value of the attribute "errors".
+        """
+        return not self.errors
+
+    def get_errors(self) -> List[Any]:
+        """
+        The function `get_errors` returns the errors attribute of the object.
+        :return: The method is returning the value of the attribute "errors".
+        """
+        return self.errors
+
+    def raise_valid(self) -> NoReturn:
+        """
+        The function raises a FormValidateError with the error message for each error in the self.errors
+        list.
+        """
+        for e in self.errors:
+            if self.code is not None:
+                raise FieldValidateError(str(e), status_code=self.code)
+            raise FieldValidateError(str(e))
+
+    def raise_all_errors(self) -> NoReturn:
+        """
+        The function `raise_all_errors` raises a `FormValidateError` exception if the form is not valid,
+        with the error messages joined together.
+        """
+        err_msg = ""
+        if not self.is_valid():
+            for error in self.errors:
+                if isinstance(error, Dict):
+                    """ """
+                    # err_msg += ",".join(reduce(lambda x, y: x + y, [x.get("msg", "") for x in error.values()]))
+                    err_msg1 = error.get("msg", "")
+
+                    if err_msg == "":
+                        err_msg = err_msg1
+                    elif err_msg1 not in err_msg:
+                        err_msg += f"#{err_msg1}"
+                else:
+                    if err_msg == "":
+                        err_msg = err_msg1
+                    if error not in err_msg:
+                        err_msg += f"#{error}"
+
+        if bool(err_msg):
+            if self.code is not None:
+                raise FieldValidateError(
+                    err_msg, status_code=self.code, data=self.errors
+                )
+            raise FieldValidateError(err_msg, data=self.errors)
+
+    def form_data(self) -> Dict[_KT, _VT]:
+        """Retrieve the valid form data.
+
+        Returns:
+            Any: The valid form data.
+
+        """
+        return self._valid_attr
+
+    def get_attrs(self) -> Dict[_KT, _VT]:
+        """Retrieve the valid form data.
+
+        Returns:
+            Any: The valid form data.
+
+        """
+        return self._valid_attr
+
+    def raise_valid_error(self):
+        """ """
+        raise NotImplementedError
+
+
+# +--------------------------------------------------
+# Validator strategy
+# +--------------------------------------------------
+
+
+class ValidatorStrategy:
+    """ """
+
+    # TODO: form拓展支持不同的校验规则
+
+    def __init__(self) -> None:
+        """ """
+
+    def is_valid(self) -> bool:
+        """ """
+
+
+# +--------------------------------------------------
+# Validator
+# +--------------------------------------------------
+class ValidatorBase:
+    """ """
+
+    require = False
+
+    def __init__(self, err_msg: str = "", code: int | None = None) -> None:
+        """ """
+        self.name: str = NoValue
+        self.value: Type[T] = NoValue
+        self.err_msg: str = err_msg
+        self.instance: Type[FMV] = NoValue
+        self.code = code
+
+    def raise_except(self, e=None) -> NoReturn:
+        """
+        The function raises an exception based on the value of the err_msg attribute.
+        """
+        if self.err_msg:
+            if self.code is not None:
+                raise FieldValidateError(self.err_msg, status_code=self.code)
+            raise FieldValidateError(self.err_msg)
+        elif e is not None:
+            raise e
+        else:
+            msg = f"{i18n.translate_ctx('GM_VALUE_MISSING_FORM_TM', self.name)}"
+            if self.code is not None:
+                raise FieldAttributeError(msg, status_code=self.code)
+            raise FieldAttributeError(msg)
+
+    def clean(self, instance: Type[FMV]) -> NoReturn:
+        """
+        The function "clean" attempts to clean data, raises a FormValidateError if validation fails, and
+        raises any other exceptions.
+        """
+        try:
+            self.clean_data(instance)
+        except FieldValidateError as e:
+            raise e
+        except Exception as e:
+            self.raise_except(e)
+
+    # @abstractmethod
+    def clean_data(self, instance: Type[FMV]):
+        """
+        The function clean_data is not implemented yet.
+
+        If the parameter does not meet the condition,
+        please use exception thrown,
+        will automatically catch processing
+        """
+        raise NotImplementedError
+
+
+class Validator(ValidatorBase):
+    """ """
+
+    """
+    The function updates an attribute of an instance with a new value.
+    
+    :param value: The parameter "value" in the above code is of type "Type[T]". This means that it can
+    accept any type of value, but it must be a subclass of type "T"
+    :type value: Type[T]
+    """
+
+    def update_attr(self, value: Type[T]):
+        """
+        Updates the attribute value of the instance.
+
+        Args:
+            value: The new value to be assigned to the attribute.
+
+        Returns:
+            None
+
+        Examples:
+            # Update the attribute value of the instance
+            >>> update_attr(10)
+        """
+        self.instance.__dict__[self.name] = value
+        self.value = value
+
+
+class BooleanValidator(Validator):
+    """
+    The BooleanValidator class is a subclass of ValidatorBase that validates a boolean value and raises
+    an exception if the value is not true.
+    """
+
+    def clean(self, instance: Type[FMV]) -> NoReturn:
+        """
+        The function "clean" attempts to clean data, raises an exception if an error occurs, and raises an
+        exception if the cleaned data is empty.
+        """
+        try:
+            value = self.clean_data(instance)
+        except Exception as e:
+            self.raise_except(e)
+        if not value:
+            self.raise_except()
+
+
+class RequireValidator(Validator):
+    """
+    The `RequireValidator` class is a subclass of `ValidatorBase` that checks if a value is empty or
+    None and raises an exception if it is.
+    """
+
+    NULL_VALUE = ["", None]
+    require = True
+
+    def clean_data(self, instance: Type[FMV]) -> NoReturn:
+        """
+        The function `clean_data` checks if a value is empty or None and raises an exception if it is.
+        """
+        if self.value in self.NULL_VALUE:
+            if self.err_msg:
+                if self.code is not None:
+                    raise FieldValidateError(
+                        f"{self.err_msg} : {self.name}", status_code=self.code
+                    )
+                raise FieldValidateError(f"{self.err_msg} : {self.name}")
+            if self.code is not None:
+                raise FieldValidateError(
+                    i18n.translate_ctx("GM_VALUE_MISSING_FORM_TM", self.name),
+                    status_code=self.code,
+                )
+            raise FieldValidateError(
+                i18n.translate_ctx("GM_VALUE_MISSING_FORM_TM", self.name),
+            )
+
+
+class StrictPasswordValidator(Validator):
+    """ """
+
+    PASSWD_VALIDATE_LENGTH = 8
+
+    def __init__(self, err_msg="", length=8) -> None:
+        """ """
+        self.name = NoValue
+        self.value = NoValue
+        self.err_msg = err_msg
+        self.instance = NoValue
+        self.length = self.PASSWD_VALIDATE_LENGTH or length
+
+    def clean_data(self, instance):
+        """
+        Clean the data by validating the password input.
+
+        Args:
+            instance: The instance of the data to be cleaned.
+
+        Raises:
+            FormValidateError: If the password input is invalid, such as empty, too short, not starting with a letter,
+            not containing at least three character types, or not meeting the specified criteria.
+        """
+        if self.value == "" or self.value is None:
+            raise FieldValidateError(i18n.translate("GM_VALUE_MISSING_PASSWD_FORM_TM"))
+        if len(self.value) < self.length:
+            raise FieldValidateError(
+                i18n.translate_ctx("GM_VALUE_MISSING_PASSWD_LEN_FORM_TM", self.length)
+            )
+        if not self.value[0].isalpha():
+            raise FieldValidateError(i18n.translate("GM_VALUE_PASSWD_FORM_STR_TM"))
+        char_types = 0
+        if any(c.isupper() for c in self.value):
+            char_types += 1
+        if any(c.islower() for c in self.value):
+            char_types += 1
+        if any(c.isdigit() for c in self.value):
+            char_types += 1
+        if any(not c.isalnum() for c in self.value):
+            char_types += 1
+        if char_types < 3:  # 满足四分之三原则
+            raise FieldValidateError(
+                i18n.translate_ctx("GM_VALUE_PASSWD_FORM_RULE_TM", self.length)
+            )
+
+
+class NameValidator(Validator):
+    """ """
+
+    def clean_data(self, instance):
+        if not bool(re.fullmatch(r"[a-zA-Z_][a-zA-Z0-9_]*", self.value)):
+            tmp = i18n.translate_ctx("GM_VALUE_EXPECTED_NAME_TM", self.name)
+            raise FieldValidateError(tmp)
+
+
+# The `BaseForm` class is a subclass of `MetaBase`.
+class BaseForm(Form, Generic[FMV]):
+    """ """
+
+    # username = StringField(validators=[RequireValidator(i18n.translate("FORM_USER_V6_TM"))])
+
+
+class BaseUserForm(Form, Generic[FMV]):
+    """Non-system operation all verification"""
+
+    _uname = StringField(validators=[RequireValidator("GM_VALUE_MISSING_FORM_TM")])
+
+
+def asdict(form: BaseForm) -> Dict[str, Any]:
+    """ """
+    return form.form_data()

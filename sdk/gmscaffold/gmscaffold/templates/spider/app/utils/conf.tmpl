@@ -1,0 +1,122 @@
+"""
+@文件        :conf.py
+@说明        :{{ description }}
+@时间        :{{ date }}
+@作者        :{{ author }}
+@邮箱        :{{ email }}
+@版本        :{{ version }}
+"""
+import os
+
+from {{ name }}.log import logger
+from {{ name }}.app.interfaces.conf import ConfigurationHandler,BaseConfig,BaseConfiguration
+
+class ConfigContext:
+    """ """
+
+    def __init__(self, config_path: str, config_filename: str, suffix: str):
+        """Config context
+
+        :param config_path:  配置路径
+        :param config_filename: 配置文件名
+        :param suffix: 配置文件后缀
+        """
+        self.config_path = config_path
+        self.config_filename = config_filename
+        self.suffix = suffix
+
+    def endwith(self, suffix: str) -> bool:
+        """
+        :param suffix: 文件后缀
+        """
+        return self.suffix == suffix
+
+    def exits(self) -> bool:
+        """ """
+        return os.path.exists(self.config())
+
+    def config(self) -> str:
+        """ """
+        return os.path.join(self.config_path, self.config_filename + "." + self.suffix)
+
+# +------------------------------------------------
+# 定义解析对象结构
+# +------------------------------------------------
+class CustomCommonConfig(BaseConfig):
+    """ """
+    export_type: str = "csv"
+    driver_name: str = "chrome"
+    login_page_username = "zhangsan"
+    login_page_passwd = "zhangsan"
+    visit_login_page = "www.baidu.com"
+    visit_domain_page = "www.domain.com"
+
+class IniConfigItem(CustomCommonConfig):
+    """ """
+    # TODO: 案例仅供参考
+    export_type: str = "xlsx"
+    driver_name: str = "chrome"
+
+class YamlConfigItem(CustomCommonConfig):
+    """ """
+    # TODO: 案例仅供参考
+    export_type: str = "csv"
+    driver_name: str = "edge"
+
+
+class TomlConfigItem(CustomCommonConfig):
+    """ """
+    # TODO: 案例仅供参考
+    
+# +------------------------------------------------
+# 不同配置文件解析
+# +------------------------------------------------
+class IniConfigurationParser(ConfigurationHandler):
+    """ini配置解析"""
+
+    def parser(self, context: ConfigContext) -> BaseConfig:
+        """ """
+        if context.endwith("ini"):
+            # TODO: 带实现读取配置内容解析
+            logger.debug(f"[ini] 解析成功 {context}")
+            return IniConfigItem()
+        else:
+            return super().parser(context)
+
+
+class YamlConfigurationParser(ConfigurationHandler):
+    """yaml配置解析"""
+
+    def parser(self, context: ConfigContext) -> BaseConfig:
+        """ """
+        if context.endwith("yaml"):
+            # TODO: 带实现读取配置内容解析
+            logger.debug(f"[yaml] 解析成功 {context}")
+            return YamlConfigItem()
+        else:
+            return super().parser(context)
+
+
+class TomlConfigurationParser(BaseConfiguration):
+    """Toml配置解析"""
+
+    def parser(self, context: ConfigContext) -> BaseConfig:
+        """ """
+        if context.endwith("toml"):
+            # TODO: 带实现读取配置内容解析
+            logger.debug(f"[toml] 解析成功 {context}")
+            return TomlConfigItem()
+        else:
+            return super().parser(context)
+
+
+def load_config(config_context: ConfigContext) -> BaseConfig:
+    """记载配置对象"""
+    logger.debug("[*] 加载爬虫配置 ...")
+
+    int_config = IniConfigurationParser()
+    yaml_config = YamlConfigurationParser()
+    toml_config = TomlConfigurationParser()
+    int_config.set_next(yaml_config).set_next(toml_config)
+
+    return int_config.parser(config_context)

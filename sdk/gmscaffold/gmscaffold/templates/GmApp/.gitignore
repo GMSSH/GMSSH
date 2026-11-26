@@ -1,0 +1,12 @@
+__pycache__
+*.pyc
+*.log
+__pycache__/
+config.yml
+.venv
+.idea
+.pre-commit-config.yaml
+version
+data_example.json
+gm_test.py
+test

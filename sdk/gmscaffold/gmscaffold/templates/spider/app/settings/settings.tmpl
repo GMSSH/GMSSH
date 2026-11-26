@@ -1,0 +1,14 @@
+"""
+@文件        :settings.py
+@说明        :{{ description }}
+@时间        :{{ date }}
+@作者        :{{ author }}
+@邮箱        :{{ email }}
+@版本        :{{ version }}
+"""
+import os
+
+APP_DIR = os.path.dirname(os.path.dirname(__file__))
+BASER_DIR = os.path.dirname(APP_DIR)
+
+CONFIG_PATH = os.path.join(BASER_DIR, "config")

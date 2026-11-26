@@ -1,0 +1,35 @@
+"""
+@文件        :cache.py
+@说明        :{{ description }}
+@时间        :{{ date }}
+@作者        :{{ author }}
+@邮箱        :{{ email }}
+@版本        :{{ version }}
+"""
+
+from datetime import datetime
+from typing import Optional
+
+from sanic import HTTPResponse
+
+
+def set_cookie(
+    response: HTTPResponse,
+    key: str,
+    value: str,
+    httponly: bool = False,
+    samesite: str = "lax",
+    domain: Optional[str] = None,
+    exp: Optional[datetime] = None,
+    secure: bool = True,
+) -> None:
+
+    response.add_cookie(
+        key,
+        value,
+        secure=secure,
+        samesite=samesite,
+        httponly=httponly,
+        domain=domain,
+        expires=exp,
+    )

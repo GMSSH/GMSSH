@@ -1,0 +1,39 @@
+"""
+@文件        :response.py
+@说明        :{{ description }}
+@时间        :{{ date }}
+@作者        :{{ author }}
+@邮箱        :{{ email }}
+@版本        :{{ version }}
+"""
+
+from sanic import Sanic
+from sanic.handlers import ErrorHandler
+from sanic.request.types import Request
+from sanic.response import HTTPResponse
+
+from {{ name }}.core import response
+from {{ name }}.core.status_code import StatusCode
+
+app = Sanic.get_app("{{ name }}")
+
+
+class CustomErrorHandler(ErrorHandler):
+    """
+    In some cases,
+    you might want to add some more error handling functionality to what is provided by default.
+    In that case, you can subclass Sanic's default error handler as such:
+    """
+
+    def default(self, request: Request, exception: Exception) -> HTTPResponse:
+        """handles errors that have no error handlers assigned"""
+        # You custom error handling logic...
+        status_code = getattr(
+            exception, "status_code", StatusCode.INTERNAL_SERVER_ERROR
+        )
+        message = getattr(exception, "message", str(exception))
+        data = getattr(exception, "data", None)
+        return response.response(code=status_code, message=message, data=data)
+
+
+app.error_handler = CustomErrorHandler()

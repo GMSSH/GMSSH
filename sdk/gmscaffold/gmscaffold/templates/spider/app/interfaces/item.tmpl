@@ -1,0 +1,15 @@
+"""
+@文件        :item.py
+@说明        :{{ description }}
+@时间        :{{ date }}
+@作者        :{{ author }}
+@邮箱        :{{ email }}
+@版本        :{{ version }}
+"""
+
+from abc import abstractmethod
+from dataclasses import dataclass
+
+@dataclass
+class BaseItem:
+    """基础的字段处理,常常用于数据格式转换成常见的数据结构"""

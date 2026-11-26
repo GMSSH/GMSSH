@@ -1,0 +1,73 @@
+"""
+@文件        :__init__.py
+@说明        :{{ description }}
+@时间        :{{ date }}
+@作者        :{{ author }}
+@邮箱        :{{ email }}
+@版本        :{{ version }}
+"""
+
+from collections import ChainMap
+from typing import Dict, Any, Optional
+
+from sanic import Sanic
+
+from {{ name }}.core.env import EnvironMent
+from .default import *
+
+
+def import_module(module: str):
+    """ """
+    _module = __import__(module, globals(), locals(), fromlist=["*"], level=1)
+    return vars(_module)
+
+
+#: 框架加载启动依赖的配置文件
+class Setting:
+    """ """
+
+    def __init__(self, app: Sanic, settings: Optional[Dict[str, Any]] = None):
+        """ """
+        self._app = app
+        self._settings = settings or {}
+        self._ext = {}
+        self.from_default()
+
+    def from_default(self):
+        """ """
+        assert isinstance(self._settings, Dict)
+        for _k, _v in ChainMap(self._settings, locals()).items():
+            """ """
+            if _k.upper() != _k:
+                continue
+            self.upsert_setting(_k, _v)
+        self.upsert_config()
+        self.load_config()
+
+    def load_config(self):
+        """ """
+        environment = self._app.config.get("ENVIRONMENT", EnvironMent.DEV)
+        _ext = {}
+        match environment:
+            case EnvironMent.DEV:
+                _ext = import_module(EnvironMent.DEV.value)
+            case EnvironMent.PROD:
+                _ext = import_module(EnvironMent.PROD.value)
+            case EnvironMent.TEST:
+                _ext = import_module(EnvironMent.TEST.value)
+            case _:
+                _ext = import_module(EnvironMent.DEV.value)
+        self._ext.update(dict(filter(lambda i: i[0].isupper(), _ext.items())))
+        self._upsert_config()
+
+    def _upsert_config(self):
+        """ """
+        self.__dict__.update(self._ext) if self._ext else ...
+
+    def upsert_config(self):
+        """ """
+        self._app.config.update(self._settings)
+
+    def upsert_setting(self, key: str, val: str):
+        """ """
+        self._settings[key] = val

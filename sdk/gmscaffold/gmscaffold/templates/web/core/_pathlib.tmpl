@@ -1,0 +1,252 @@
+# -*- encoding: utf-8 -*-
+"""
+@文件        :Pathlib.py
+@说明        :{{ description }}
+@时间        :{{ date }}
+@作者        :{{ author }}
+@邮箱        :{{ email }}
+@版本        :{{ version }}
+"""
+import os
+import subprocess
+
+# +----------------------------
+# BASE_PATH
+# +----------------------------
+BASE_GM_PATH = "{}/.__gmb/"
+TMP_PATH = "/tmp"
+ROOT_WWW_PATH = "/www"
+SERVER_PATH = "/www/server/"
+GMSSH_MAIN_PATH = "/tmp/.__gmb/scripts/py"
+
+# +----------------------------
+# GMSSH_PATH
+# +----------------------------
+GMSSH_PATH = BASE_GM_PATH.format(TMP_PATH)
+SCRIPT_PATH = os.path.join(GMSSH_PATH, "script")
+SCRIPTS_PATH = os.path.join(GMSSH_PATH, "scripts")
+PLUGIN_PATH = os.path.join(GMSSH_PATH, "plugin")
+GMPY_PATH = os.path.join(SCRIPTS_PATH, "py")
+CONFIG_PATH = os.path.join(GMPY_PATH, "config")
+TMP_DATA_PATH = os.path.join(GMSSH_PATH, "data")
+
+# +----------------------------
+# GMB_PATH
+# +----------------------------
+GMB_PATH = BASE_GM_PATH.format(ROOT_WWW_PATH)
+
+
+# +----------------------------
+# Default Settings
+# +----------------------------
+class DefaultSettings:
+    """ """
+
+    GMB_PATH = GMB_PATH
+    # 服务器目录 /www/server
+    SERVER_PATH = SERVER_PATH
+    # 安装的时候，默认的脚本路径
+    GMSSH_MAIN_PATH = GMSSH_MAIN_PATH
+    # 桌面路径 /www/.__gmb/
+    DESKTOP_PATH = os.path.join(GMB_PATH, "desktop")
+    # 回收站的位置
+    RECYCLE_BIN_PATH = os.path.join(GMB_PATH, ".Recycle_bin")
+    # 缓存路径
+    CACHE_PATH = os.path.join(GMB_PATH, "cache")
+    SESSION_PATH = os.path.join(GMB_PATH, "cache/session")
+    # 数据路径
+    DATA_PATH = os.path.join(GMB_PATH, "data")
+    SCRIPT_PATH = os.path.join(GMB_PATH, "script")
+    # 插件目录
+    PLUGIN_PATH = os.path.join(GMB_PATH, "plugin")
+    DEFAULT_DB_PATH = os.path.join(DATA_PATH, "default.db")
+    # 默认code路径
+    DEFAULT_CODE_PATH = os.path.join(DATA_PATH, "code")
+    # 文件日志目录
+    DEFAULT_LOG_PATH = os.path.join(GMB_PATH, "logs")
+    DEFAULT_PLUGIN_LOG_PATH = os.path.join(DEFAULT_LOG_PATH, "plugin")
+    DEFAULT_INNER_APP_LOG_PATH = os.path.join(DEFAULT_LOG_PATH, "inner_app")
+    GMSSH_PROJECT_DEFAULT_LOG_PATH = os.path.join(GMB_PATH, "logs")
+
+
+# +----------------------------
+# User Settings
+# +----------------------------
+class UserDefaultSettings:
+    """ """
+
+    ROOT_WWW_PATH = ROOT_WWW_PATH
+    GMB_PATH = BASE_GM_PATH
+    TMP_PATH = TMP_PATH
+
+    SERVER_PATH = os.path.join(GMB_PATH, "www/server/")
+    DESKTOP_PATH = os.path.join(GMB_PATH, "desktop")
+    CACHE_PATH = os.path.join(GMB_PATH, "cache")
+    SESSION_PATH = os.path.join(GMB_PATH, "cache/session")
+    DATA_PATH = os.path.join(GMB_PATH, "data")
+    SCRIPT_PATH = os.path.join(GMB_PATH, "script")
+    PLUGIN_PATH = os.path.join(GMB_PATH, "plugin")
+    RECYCLE_BIN_PATH = os.path.join(GMB_PATH, ".Recycle_bin")
+
+    # 默认数据库路径
+    DEFAULT_DB_PATH = os.path.join(DATA_PATH, "default.db")
+    # 默认code路径
+    DEFAULT_CODE_PATH = os.path.join(DATA_PATH, "code")
+    # 文件日志目录
+    DEFAULT_LOG_PATH = os.path.join(GMB_PATH, "logs")
+    DEFAULT_PLUGIN_LOG_PATH = os.path.join(DEFAULT_LOG_PATH, "plugin")
+    DEFAULT_INNER_APP_LOG_PATH = os.path.join(DEFAULT_LOG_PATH, "inner_app")
+    GMSSH_PROJECT_DEFAULT_LOG_PATH = os.path.join(GMB_PATH, "logs")
+
+
+# +----------------------------
+#  utils
+# +----------------------------
+def get_env_user_home():
+    """读取系统环境变量中的用户"""
+
+    output = subprocess.check_output("echo ~", shell=True)
+    return os.environ.get("HOME") or output.decode("utf-8").strip()
+
+
+# +----------------------------
+# Path utils
+# +----------------------------
+def make_path(base_path: str, *args):
+    """ """
+    u_root = get_env_user_home()
+    if len(args) > 0:
+        return os.path.join(base_path.format(u_root), *args)
+    return base_path.format(u_root)
+
+
+async def gmssh_path(path: str = "", base=False) -> str:
+    """
+    获取gmssh路径
+    :param path:
+    :return:
+    """
+    if base:
+        base_path = os.path.join(DefaultSettings.GMB_PATH, path)
+        return base_path
+    else:
+        base_path = UserDefaultSettings.GMB_PATH
+        u_root = get_env_user_home()
+        if path:
+            return os.path.join(base_path.format(u_root), path)
+        else:
+            return base_path.format(u_root)
+
+
+async def recycle_path(path: str = "", base=False) -> str:
+    """回收站路径"""
+    if not base:
+        u_root = get_env_user_home()
+        return os.path.join(BASE_GM_PATH.format(u_root), ".Recycle_bin", path)
+    return os.path.join(DefaultSettings.GMB_PATH, ".Recycle_bin", path)
+
+
+async def data_path(path: str = "", base=False) -> str:
+    """数据路径"""
+    if not base:
+        u_root = get_env_user_home()
+        return os.path.join(UserDefaultSettings.DATA_PATH.format(u_root), path)
+    return os.path.join(DefaultSettings.DATA_PATH, path)
+
+
+async def tmp_path(path: str = "tmp", base=False) -> str:
+    """ """
+    if not base:
+        u_root = get_env_user_home()
+        return os.path.join(UserDefaultSettings.GMB_PATH.format(u_root), path)
+    return os.path.join(DefaultSettings.GMB_PATH, path)
+
+
+async def plugin_path(path: str = "tmp", base=False) -> str:
+    """ """
+    if not base:
+        u_root = get_env_user_home()
+        return os.path.join(UserDefaultSettings.PLUGIN_PATH.format(u_root), path)
+    return os.path.join(DefaultSettings.PLUGIN_PATH, path)
+
+
+async def code_path(path: str = "tmp", base=False) -> str:
+    """ """
+    if not base:
+        u_root = get_env_user_home()
+        return os.path.join(UserDefaultSettings.DEFAULT_CODE_PATH.format(u_root), path)
+    return os.path.join(DefaultSettings.DEFAULT_CODE_PATH, path)
+
+
+async def log_path(path: str = "tmp", base=False) -> str:
+    """ """
+    if not base:
+        u_root = get_env_user_home()
+        return os.path.join(UserDefaultSettings.DEFAULT_LOG_PATH.format(u_root), path)
+    return os.path.join(DefaultSettings.DEFAULT_LOG_PATH, path)
+
+
+async def desktop_path(path: str = "tmp", base=False) -> str:
+    """ """
+    if not base:
+        u_root = get_env_user_home()
+        return os.path.join(UserDefaultSettings.DESKTOP_PATH.format(u_root), path)
+    return os.path.join(DefaultSettings.DESKTOP_PATH, path)
+
+
+async def cache_path(path: str = "tmp", base=False) -> str:
+    """ """
+    if not base:
+        u_root = get_env_user_home()
+        return os.path.join(UserDefaultSettings.CACHE_PATH.format(u_root), path)
+    return os.path.join(DefaultSettings.CACHE_PATH, path)
+
+
+async def script_path(path: str = "tmp", base=False) -> str:
+    """ """
+    if not base:
+        u_root = get_env_user_home()
+        return os.path.join(UserDefaultSettings.SCRIPT_PATH.format(u_root), path)
+    return os.path.join(DefaultSettings.SCRIPT_PATH, path)
+
+
+async def session_path(path: str = "tmp", base=False) -> str:
+    """ """
+    if not base:
+        u_root = get_env_user_home()
+        return os.path.join(UserDefaultSettings.SESSION_PATH.format(u_root), path)
+    return os.path.join(DefaultSettings.SESSION_PATH, path)
+
+
+async def server_path(path: str = "", base=False) -> str:
+    """
+    获取server路径
+    :param path:
+    :param base: 是否是基础环境路径
+    :return:
+    """
+    if not base:
+        u_root = get_env_user_home()
+        return os.path.join(UserDefaultSettings.SERVER_PATH.format(u_root), path)
+    return os.path.join(DefaultSettings.SERVER_PATH, path)
+
+
+async def get_setup_path():
+    """ """
+    return SERVER_PATH
+
+
+async def get_panel_path():
+    """ """
+    return "{}/panel".format(get_setup_path())
+
+
+async def get_desktop_path(username: str | None = None):
+    """ """
+    u_root = get_env_user_home()
+    return UserDefaultSettings.DESKTOP_PATH.format(u_root)
+
+
+async def main_path() -> str:
+    """ """
+    return os.path.join(GMPY_PATH, "main")

@@ -1,0 +1,48 @@
+"""
+@文件        :exceptions.py
+@说明        :{{ description }}
+@时间        :{{ date }}
+@作者        :{{ author }}
+@邮箱        :{{ email }}
+@版本        :{{ version }}
+"""
+from functools import partial, wraps
+
+
+class SpiderException(Exception):
+    """爬虫基础错误类型接口"""
+
+
+class SpiderRequestTimeoutError(SpiderException):
+    """爬虫发送请求超时的异常"""
+
+
+class SpiderElementParserError(SpiderException):
+    """爬虫元素解析失败的异常"""
+
+
+class SpiderAttributeError(SpiderException):
+    """属性错误的异常"""
+
+
+class SpiderConfigParserError(SpiderException):
+    """配置解析失败"""
+
+
+def catch_exception(fun=None, alarm=None, err_type: Exception = None):
+    """ """
+    if fun is None:
+        return partial(catch_exception, alarm=alarm, err_type=err_type)
+
+    @wraps(fun)
+    def inner(*args, **kw):
+        """ """
+        try:
+            return fun(*args, **kw)
+        except Exception as e:
+            # TODO: 通知
+            # TODO: 自行根据异常类添加方法或者属性来完成是否进行通知
+            alarm(str(e)) if alarm else ...
+            raise err_type(str(e))
+
+    return inner

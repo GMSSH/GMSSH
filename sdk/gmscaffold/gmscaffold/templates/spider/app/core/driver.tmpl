@@ -1,0 +1,71 @@
+"""
+@文件        :driver.py
+@说明        :{{ description }}
+@时间        :{{ date }}
+@作者        :{{ author }}
+@邮箱        :{{ email }}
+@版本        :{{ version }}
+"""
+
+from {{ name }}.log import logger
+from {{ name }}.app.utils.defer import Page
+from {{ name }}.app.core.page import LoginPage,DomainPage
+from {{ name }}.app.interfaces.driver import BaseDriver
+
+
+class ChromeDriver(BaseDriver):
+    """自定义chrome驱动"""
+
+    def __init__(self) -> None:
+        """ """
+
+    def open_page(self, url) -> Page:
+        """ """
+        logger.debug(f"[ChromeDriver] 访问页面: {url} ")
+        return
+
+    def login(self, page, config):
+        """ """
+        login_page = LoginPage(page, config)
+        return login_page.login()
+
+    def get_domains(self, page, config):
+        """ """
+        # TODO: 自行根据情况是否需要config，默认会传递
+        domain_page = DomainPage(page)
+        return domain_page.get_domains()
+
+
+
+class EdgeDriver(BaseDriver):
+    """自定义edge驱动"""
+
+    def open_page(self, url):
+        """ """
+        logger.debug(f"[EdgeDriver] 访问页面: {url} ")
+
+    def login(self, page, config):
+        """ """
+        login_page = LoginPage(page, config)
+        return login_page.login()
+
+    def get_domains(self, page, config):
+        """ """
+        # TODO: 自行根据情况是否需要config，默认会传递
+        domain_page = DomainPage(page)
+        return domain_page.get_domains()
+
+class DriverFactory:
+    """启动工厂
+
+    如果驱动只有一个的时候可以不使用工厂的设计，直接使用驱动对象实例化即可
+    """
+
+    def create_driver(self, name: str = "chrome"):
+        """ """
+        if name == "chrome":
+            return ChromeDriver()
+        elif name == "edge":
+            return EdgeDriver()
+        else:
+            raise ValueError(f"Unknown driver name: {name}")

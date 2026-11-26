@@ -1,0 +1,36 @@
+# -*- encoding: utf-8 -*-
+"""
+@文件        :trace.py
+@说明        :{{ description }}
+@时间        :{{ date }}
+@作者        :{{ author }}
+@邮箱        :{{ email }}
+@版本        :{{ version }}
+"""
+import os
+
+
+async def get_pre_exec_fn(run_user):
+    """
+    @name 获取指定执行用户预处理函数
+    @param run_user<string> 运行用户
+    @return 预处理函数
+    """
+    import pwd
+
+    pid = pwd.getpwnam(run_user)
+    uid = pid.pw_uid
+    gid = pid.pw_gid
+
+    def _exec_rn():
+        os.setgid(gid)
+        os.setuid(uid)
+
+    return _exec_rn
+
+
+async def get_error_info():
+    """ """
+    import traceback
+
+    return traceback.format_exc()

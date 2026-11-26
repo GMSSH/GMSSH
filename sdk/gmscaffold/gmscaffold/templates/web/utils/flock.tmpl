@@ -1,0 +1,53 @@
+# -*- encoding: utf-8 -*-
+"""
+@文件        :flock.py
+@说明        :{{ description }}
+@时间        :{{ date }}
+@作者        :{{ author }}
+@邮箱        :{{ email }}
+@版本        :{{ version }}
+"""
+
+import threading
+
+try:
+    import fcntl
+except ImportError:
+    import os
+
+    fnctl = os.fnctl
+
+
+class FileLock:
+    """A class to manage file locking"""
+
+    def __init__(self, lock_file):
+        """Initialize the FileLock with the provided lock file"""
+        self.lock_file = lock_file
+        self.lock_fd = open(lock_file, "w")
+        self.lock = threading.Lock()
+
+    def acquire_file_lock(self, *args, **kwargs):
+        """Acquire a file lock using fcntl.flock"""
+        try:
+            fcntl.flock(self.lock_fd, fcntl.LOCK_EX)
+        except:
+            return False
+        else:
+            return True
+
+    def release_file_lock(self, *args, **kwargs):
+        """Release a file lock"""
+        fcntl.flock(self.lock_fd, fcntl.LOCK_UN)
+
+    def __enter__(self):
+        """Context manager entry function to acquire the file lock and thread lock"""
+        self.acquire_file_lock()
+        self.lock.acquire()
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        """Context manager exit function to release the file lock and thread lock, and close the file descriptor"""
+        self.release_file_lock()
+        self.lock.release()
+        self.lock_fd.close()

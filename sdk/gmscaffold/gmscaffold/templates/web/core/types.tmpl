@@ -1,0 +1,143 @@
+# -*- encoding: utf-8 -*-
+"""
+@文件        :types.py
+@说明        :{{ description }}
+@时间        :{{ date }}
+@作者        :{{ author }}
+@邮箱        :{{ email }}
+@版本        :{{ version }}
+"""
+
+
+from typing import Iterable  # type: ignore
+from typing import (  # type: ignore
+    Any,
+    Callable,
+    Dict,
+    Generic,
+    Iterator,
+    List,
+    Mapping,
+    MutableMapping,
+    MutableSequence,
+    NamedTuple,
+    NoReturn,
+    Set,
+    Tuple,
+    Type,
+    TypeVar,
+    Union,
+    cast,
+)
+
+__all__ = []
+
+
+from loguru._logger import Logger
+
+# `LoggerType = TypeVar("LoggerType", bound=Logger)` is defining a type variable `LoggerType` that is
+# bound to the type `Logger`. This means that any value assigned to `LoggerType` must be a subclass of
+# `Logger` or `Logger` itself. This is useful when you want to specify that a variable or function
+# parameter should be of a specific type or a subclass of that type.
+LoggerType = TypeVar("LoggerType", bound=Logger)
+
+
+class MetaBase(object):
+    """ """
+
+
+_KT = TypeVar("_KT")  # Key type.
+_VT = TypeVar("_VT")  # Value type.
+
+# `Self = TypeVar("Self")` is defining a type variable `Self` that can be used to represent the type
+# of the current class or subclass. It is commonly used in generic classes or methods to indicate that
+# the type of a parameter or return value should be the same as the type of the class or subclass
+# itself. This allows for more flexible and reusable code.
+Self = TypeVar("Self")
+
+
+class FormVar(Generic[Self]):
+    """
+    The `FormVar` class is a generic class that represents a form variable and provides methods for
+    validation and error handling.
+    """
+
+    errors: List[Any] = []
+    _valid_attr: Dict[_KT, _VT] = {}
+
+    def is_valid(self: Self): ...
+
+    def get_errors(self: Self): ...
+
+    def raise_valid(self: Self): ...
+
+    def form_data(self: Self): ...
+
+    def raise_all_errors(self): ...
+
+
+FMV = TypeVar("FMV", bound=FormVar)
+
+# `S = TypeVar('S', bound=str)` is defining a type variable `S` that is bound to the type `str`. This
+# means that any value assigned to `S` must be of type `str` or a subclass of `str`. This is useful
+# when you want to specify that a variable or function parameter should be of type `str` or a subclass
+# of `str`.
+S = TypeVar("S", bound=str)
+
+# The line `A = TypeVar('A', bound=Any)` is defining a type variable `A` that is bound to the type
+# `Any`. This means that any value assigned to `A` can be of any type. The `bound=Any` parameter
+# specifies that `A` can be any type, including built-in types, user-defined types, or generic types.
+# This allows for more flexibility when working with generic classes or methods that need to accept
+# values of any type.
+A = TypeVar("A", bound=Any)
+
+# The line `O = TypeVar('O', bound=FormVar)` is defining a type variable `O` that is bound to the type
+# `FormVar`. This means that any value assigned to `O` must be of type `FormVar` or a subclass of
+# `FormVar`. This is useful when you want to specify that a variable or function parameter should be
+# of type `FormVar` or a subclass of `FormVar`.
+O = TypeVar("O", bound=FormVar)
+
+
+T = TypeVar("T", str, int, float, complex, bytes, list, tuple, dict)
+
+
+class FieldVar(Generic[S, A, Self]):
+    """
+    The `FieldVar` class is a generic class that represents a field variable with a name, value, and
+    instance, and has a method to clean data.
+    """
+
+    def __init__(self) -> None:
+        """
+        The above code defines a class with an empty constructor that initializes two variables, "name" and
+        "err_msg".
+        """
+        self.name: S
+        self.err_msg: S
+
+    def clean_data(self: Self, instance: O, value: S):
+        """
+        The function "clean_data" takes in an instance and a value, but its purpose is not
+        specified.
+
+        :param self: The "self" parameter refers to the instance of the class that the method is
+        being called on. It is used to access the attributes and methods of the class
+        :type self: Self
+        :param instance: The instance parameter refers to the instance of the class that the method
+        is being called on. It allows you to access and modify the attributes and methods of the
+        instance within the method
+        :type instance: O
+        :param value: The value parameter represents the data that needs to be cleaned
+        :type value: S
+        """
+
+    def validator(self, value: A):
+        """
+        The function "validator" takes a value of type A as input and performs some validation on it.
+
+        :param value: The parameter "value" is of type "A"
+        :type value: A
+        """
+
+
+FDV = TypeVar("FDV", bound=FieldVar)

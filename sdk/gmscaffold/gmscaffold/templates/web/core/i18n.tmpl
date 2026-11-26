@@ -1,0 +1,579 @@
+# -*- encoding: utf-8 -*-
+"""
+@文件        :i18n.py
+@说明        :{{ description }}
+@时间        :{{ date }}
+@作者        :{{ author }}
+@邮箱        :{{ email }}
+@版本        :{{ version }}
+"""
+import os
+import enum
+import functools
+from pathlib import Path
+from collections import defaultdict
+from pathlib import Path
+from abc import ABCMeta, abstractmethod
+from typing import Final, List, Any, Union, Dict
+
+from .i18n_const import Language
+from .cache import dc
+from . import _pathlib as Pathlib
+from {{ name }}.utils.IniUtils import IniUtils
+
+__all__ = [
+    "Ten",
+    "Tja",
+    "Tru",
+    "TzhCN",
+    "TzhTW",
+    "TranslateBase",
+    "DefaultTranslate",
+    "T",
+    "GI18n",
+]
+
+# Directory for i18n files
+I18N_DIR = os.path.join(
+    os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "i18n"
+)
+
+# Error message
+TRANSLATE_UNKNOWN_CODE = "Unknown language code."
+TRANSLATE_NOT_FOUND_CODE = "File %s not found"
+
+
+cache = dc.Cache(
+    Pathlib.make_path(Pathlib.UserDefaultSettings.CACHE_PATH, "i18n_cache_directory")
+)
+
+
+class I18nStrBase(str):
+
+    tpl = None
+    source = None
+    value = None
+
+    def clone(self):
+        """ """
+        return self
+
+    def set_tpl(self, tpl):
+        self.tpl = tpl
+
+    def set_source(self, source):
+        self.source = source
+
+    def set_value(self, value):
+        self.value = value
+
+    def __str__(self):
+        """ """
+        return self.clone()
+
+    def __repr__(self):
+        """ """
+        return self.clone()
+
+
+class I18nStr(I18nStrBase):
+    """i18 translate"""
+
+    def clone(self):
+        """ """
+        if self.tpl and self.source:
+            return T._translate(T.LANG, self.tpl, self.source)
+        return self
+
+
+class I18nCtxStr(I18nStrBase):
+    """i18 translate_ctx"""
+
+    def clone(self):
+        """ """
+        if self.tpl and self.source:
+            return T._translate_ctx(T.LANG, self.tpl, *self.value, source=self.source)
+        return self
+
+
+class I18nPartialStr(I18nStrBase):
+    """i18 translate_partial"""
+
+    def clone(self):
+        """ """
+        if self.tpl and self.source:
+            return functools.partial(
+                T._translate_partial, cls=T, key=self.tpl, source=self.source
+            )
+        return self
+
+
+class I18nCtxPartialStr(I18nStrBase):
+    """i18 translate_ctx_partial"""
+
+    def clone(self):
+        """ """
+        if self.tpl and self.source:
+            return functools.partial(
+                T._translate_ctx_partial,
+                cls=T,
+                key=self.tpl,
+                value=self.value,
+                source=self.source,
+            )
+        return self
+
+
+# 自定义装饰器函数
+def disk_lru_cache(maxsize=128):
+    """A cache for disk lru cache .
+
+    Args:
+        maxsize (int, optional): [description]. Defaults to 128.
+    """
+
+    def decorator(func):
+        """Cache the result of a function .
+
+        Args:
+            func ([type]): [description]
+
+        Returns:
+            [type]: [description]
+        """
+        # 通过functools.lru_cache控制缓存大小
+        memoize_func = functools.lru_cache(maxsize)(func)
+
+        @functools.wraps(func)
+        def wrapper(*args, **kwargs):
+            """Cache the result of a function .
+
+            Returns:
+                [type]: [description]
+            """
+            key = (func.__name__, args, frozenset(kwargs.items()))
+
+            # 检查缓存中是否存在结果
+            if key in cache:
+                return cache[key]
+
+            # 如果结果不存在，则调用原始函数
+            result = memoize_func(*args, **kwargs)
+            # 将结果存入缓存中
+            cache[key] = result
+            return result
+
+        return wrapper
+
+    return decorator
+
+
+class Language(str, enum.Enum):
+    """Language codes"""
+
+    EN = "en"
+    JA = "ja"
+    RU = "ru"
+    ZH_CN = "zh-CN"
+    ZH_TW = "zh-TW"
+
+    @classmethod
+    def values(cls):
+        """ """
+        return [x.value for x in cls.__members__.values()]
+
+
+class TranslateSource(int, enum.Enum):
+    """ """
+
+    # 内置的 : 主要是框架内部使用的类型
+    IN = 1
+    # 外置的 : 主要是框架外部使用的类型
+    OUT = 2
+
+    @classmethod
+    def string_values(cls):
+        """ """
+        return [str(v.value) for v in cls.__members__.values()]
+
+
+class _T:
+    """Internal class for translation-related properties and methods"""
+
+    # Default language code
+    LANG = Language.ZH_CN
+    # Path to English i18n file
+    EN_I18N_DIR: Path
+
+    @classmethod
+    def exists_t(cls, file):
+        """Check if the specified i18n file exists, raise a ValueError if not"""
+        if not os.path.exists(file):
+            # TODO: 需要处理递归异常问题
+            raise Exception(T().translate_ctx("CONTROLLER_BASE_FILE_NOT_FOUND", file))
+        ini_utils = IniUtils()
+        return ini_utils.read(file)
+
+    @classmethod
+    def translate(cls, key):
+        """Get translation for the specified key"""
+        t = cls.exists_t(cls.EN_I18N_DIR)
+        return t.get(key)
+
+    @classmethod
+    def translate_ctx(cls, key, *value):
+        """Get formatted translation for the specified key and value"""
+        fmt: str = cls.translate(key)
+        if not fmt:
+            return None
+        return fmt.format(*value)
+
+
+class Ten(_T):
+    """English i18n class"""
+
+    LANG: Final = Language.EN
+    EN_I18N_DIR = os.path.join(I18N_DIR, f"{Language.EN.value}.ini")
+
+
+class Tja(_T):
+    """Japanese i18n class"""
+
+    LANG: Final = Language.JA
+    EN_I18N_DIR = os.path.join(I18N_DIR, f"{Language.JA.value}.ini")
+
+
+class Tru(_T):
+    """Russian i18n class"""
+
+    LANG: Final = Language.RU
+    EN_I18N_DIR = os.path.join(I18N_DIR, f"{Language.RU.value}.ini")
+
+
+class TzhCN(_T):
+    """Chinese i18n class"""
+
+    LANG: Final = Language.ZH_CN
+    EN_I18N_DIR = os.path.join(I18N_DIR, f"{Language.ZH_CN.value}.ini")
+
+
+class TzhTW(_T):
+    """Chinese i18n class"""
+
+    LANG: Final = Language.ZH_TW
+    EN_I18N_DIR = os.path.join(I18N_DIR, f"{Language.ZH_TW.value}.ini")
+
+
+class TranslateBase(metaclass=ABCMeta):
+    """ """
+
+    def __init__(self, lang: Language) -> None:
+        """ """
+        self._lang = lang
+
+    @abstractmethod
+    def translate(self, *args, **kwargs): ...
+
+    @abstractmethod
+    def translate_ctx(self, *args, **kwargs): ...
+
+    @abstractmethod
+    def translate_load(self, *args, **kwargs): ...
+
+
+# Plugin
+class DefaultTranslate(TranslateBase):
+    """ """
+
+    def translate(self, key: Language):
+        """ """
+        match self._lang:
+            case Language.EN:
+                return Ten.translate(key)
+            case Language.JA:
+                return Tja.translate(key)
+            case Language.RU:
+                return Tru.translate(key)
+            case Language.ZH_CN:
+                return TzhCN.translate(key)
+            case Language.ZH_TW:
+                return TzhTW.translate(key)
+            case _:
+                raise ValueError(TRANSLATE_UNKNOWN_CODE)
+
+    def translate_ctx(self, key, *value):
+        """Get formatted translation for the specified language and value"""
+        match self._lang:
+            case Language.EN:
+                return Ten.translate_ctx(key, *value)
+            case Language.JA:
+                return Tja.translate_ctx(key, *value)
+            case Language.RU:
+                return Tru.translate_ctx(key, *value)
+            case Language.ZH_CN:
+                return TzhCN.translate_ctx(key, *value)
+            case Language.ZH_TW:
+                return TzhTW.translate_ctx(key, *value)
+            case _:
+                raise ValueError(TRANSLATE_UNKNOWN_CODE)
+
+    def translate_load(self, file, ignore) -> Path:
+        """ """
+        path = Path(file)
+        file_dir = os.path.join(os.path.dirname(file), self._lang)
+        if not os.path.exists(file_dir):
+            os.makedirs(file_dir)
+        file_path = os.path.join(file_dir, path.name)
+        if not os.path.exists(file_path) and not ignore:
+            raise ValueError(TRANSLATE_NOT_FOUND_CODE % file_path)
+        return file_path
+
+
+class PluginTranslate(TranslateBase):
+    """
+    If both TEMPLATE_PATH and TEMPLATE are configured,
+    the priority of TEMPLATE is higher than that of TEMPLATE_PATH
+    """
+
+    TEMPLATE: Dict[str, Dict[str, str]] = defaultdict(dict)
+    TEMPLATE_PATH = None
+
+    def _check_set(self):
+        """ """
+        if not self.TEMPLATE and not self.TEMPLATE_PATH:
+            raise AttributeError(T().translate("UTILS_I18N_TM_V1"))
+
+    def translate(self, key):
+        """ """
+        self._check_set()
+        if self.TEMPLATE:
+            lang = self.TEMPLATE.get(self._lang)
+            if not lang:
+                raise KeyError(T().translate_ctx("UTILS_I18N_TM_V2", self._lang))
+            value = lang.get(key)
+            if value is not None:
+                return value
+
+        # Read file
+        if self.TEMPLATE_PATH:
+            _T.EN_I18N_DIR = os.path.join(self.TEMPLATE_PATH, f"{self._lang}.ini")
+            return _T.translate(key)
+
+    def translate_ctx(self, key, *value):
+        """ """
+        self._check_set()
+        if self.TEMPLATE:
+            lang = self.TEMPLATE.get(self._lang)
+            if not lang:
+                raise KeyError(T().translate_ctx("UTILS_I18N_TM_V2", self._lang))
+            value_tmp = lang.get(key)
+            if value_tmp is not None:
+                return value_tmp.format(*value)
+
+        # Read file
+        if self.TEMPLATE_PATH:
+            _T.EN_I18N_DIR = os.path.join(self.TEMPLATE_PATH, f"{self._lang}.ini")
+            return _T.translate_ctx(key, *value)
+
+    def translate_load(self, file, ignore) -> Path:
+        """ """
+        # TODO
+
+    @classmethod
+    def set_template(cls, lang: str, key: str, value: str):
+        """
+        Configure internationalized templates using memory
+        """
+        cls.TEMPLATE[lang].setdefault(key, value)
+
+    @classmethod
+    def set_template_path(cls, path=None, plugin_name=None):
+        """
+        This Python function sets the template path based on the provided path or plugin name.
+
+        :param path: The `path` parameter is a string representing the file path where the template files
+        are located. If `plugin_name` is provided, the `path` will be set to a specific directory within the
+        plugin path
+        :param plugin_name: The `plugin_name` parameter is used to specify the name of a plugin. If
+        `plugin_name` is provided, the `set_template_path` method will construct a path using the
+        `PLUGIN_PATH` from the settings, the `plugin_name`, and the "i18n" directory. If
+        """
+        if plugin_name is not None:
+            path = os.path.join(
+                Pathlib.UserDefaultSettings.PLUGIN_PATH, plugin_name, "i18n"
+            )
+        else:
+            path = path
+        cls.TEMPLATE_PATH = path
+
+
+# +--------------------------------------------------
+# Translation
+# +--------------------------------------------------
+
+
+def hash2str(args):
+    """ """
+    new_str_list = []
+    for item in args:
+        try:
+            hash(item)
+        except:
+            new_str_list.append(str(item))
+        else:
+            new_str_list.append(item)
+    return new_str_list
+
+
+def get_env_lang():
+    lang = os.getenv("GMB_LANG")
+    return lang
+
+
+class T:
+    """
+    # This class provides methods for translating text using a specified language and source, with caching
+    # functionality and the ability to set a default language.
+    """
+
+    LANG: Language = Language.EN
+
+    @classmethod
+    @disk_lru_cache(maxsize=128)
+    def _translate(cls, lang, key, source):
+        """ """
+        if source == TranslateSource.IN:
+            return DefaultTranslate(lang).translate(key)
+        return PluginTranslate(lang).translate(key)
+
+    @classmethod
+    def translate(cls, key: str, source: TranslateSource = TranslateSource.IN):
+        """Get translation for the specified language"""
+
+        i18n_str = I18nStr(cls._translate(cls.LANG, key, source))
+        i18n_str.set_tpl(key)
+        i18n_str.set_source(source)
+        return i18n_str
+
+    def _translate_partial(cls, lang, key, source):
+        """ """
+        if source == TranslateSource.IN:
+            return DefaultTranslate(lang).translate(key)
+        return PluginTranslate(lang).translate(key)
+
+    @classmethod
+    def translate_partial(
+        cls, key: Language, source: TranslateSource = TranslateSource.IN
+    ):
+        """ """
+        i18n_str = I18nPartialStr(
+            functools.partial(cls._translate_partial, cls=cls, key=key, source=source)
+        )
+        i18n_str.set_tpl(key)
+        i18n_str.set_source(source)
+        return i18n_str
+
+    @classmethod
+    @disk_lru_cache(maxsize=128)
+    def _translate_ctx(cls, lang, key, *value, source=None):
+        """ """
+        if source == TranslateSource.IN:
+            return DefaultTranslate(lang).translate_ctx(key, *value)
+        return PluginTranslate(lang).translate_ctx(key, *value)
+
+    @classmethod
+    def translate_ctx(cls, key, *value, source: TranslateSource = TranslateSource.IN):
+        """Get formatted translation for the specified language and value"""
+        """Get translation for the specified language"""
+        value = hash2str(value)
+        i18n_str = I18nCtxStr(cls._translate_ctx(cls.LANG, key, *value, source=source))
+        i18n_str.set_tpl(key)
+        i18n_str.set_source(source)
+        i18n_str.set_value(value)
+        return i18n_str
+
+    @classmethod
+    def _translate_ctx_partial(cls, lang, key, value, source=None):
+        """ """
+        if source == TranslateSource.IN:
+            return DefaultTranslate(lang).translate_ctx(key, *value)
+        return PluginTranslate(lang).translate_ctx(key, *value)
+
+    @classmethod
+    def translate_ctx_partial(
+        cls, key: str, value: List[Any], source: TranslateSource = TranslateSource.IN
+    ):
+        """Get formatted translation for the specified language"""
+        i18n_str = I18nCtxPartialStr(
+            functools.partial(
+                cls._translate_ctx_partial, cls=cls, key=key, value=value, source=source
+            )
+        )
+        i18n_str.set_tpl(key)
+        i18n_str.set_source(source)
+        i18n_str.set_value(value)
+        return i18n_str
+
+    @classmethod
+    @disk_lru_cache(maxsize=128)
+    def _translate_load(cls, lang, file, source=None, ignore=False):
+        """Return a translate from a file .
+        Returns:
+            [type]: [description]
+        """
+        if source == TranslateSource.IN:
+            return DefaultTranslate(lang).translate_load(file, ignore)
+        return PluginTranslate(lang).translate_load(file, ignore)
+
+    @classmethod
+    def translate_load(
+        cls, file: Path, source: TranslateSource = TranslateSource.IN, ignore=False
+    ):
+        """ """
+        return cls._translate_load(cls.LANG, file, source, ignore)
+
+    @classmethod
+    def _translate_load_partial(cls, lang, file, source=None, ignore=False):
+        """ """
+        if source == TranslateSource.IN:
+            return DefaultTranslate(lang).translate_load(file, ignore)
+        return PluginTranslate(lang).translate_load(file, ignore)
+
+    @classmethod
+    def translate_load_partial(
+        cls, file: Path, source: TranslateSource = TranslateSource.IN, ignore=False
+    ):
+        """ """
+        return functools.partial(
+            cls._translate_load_partial,
+            cls=cls,
+            file=file,
+            source=source,
+            ignore=ignore,
+        )
+
+    @classmethod
+    def translate_app_info(cls, file_root: Path, filename: str):
+        """
+        :param : file_root 国际化目标目录
+        :param : filename : 需要国际化的文件
+        """
+        file = os.path.join(file_root, filename)
+        return cls._translate_load(
+            cls.LANG, file, source=TranslateSource.IN, ignore=True
+        )
+
+    @classmethod
+    def set_lang(cls, lang: Language = Language.ZH_CN):
+        """Set the default language"""
+        cls.LANG = lang
+
+    @classmethod
+    def get_lang(cls):
+        """ """
+        return cls.LANG
+
+    @property
+    def lang(self):
+        """ """
+        return self.LANG

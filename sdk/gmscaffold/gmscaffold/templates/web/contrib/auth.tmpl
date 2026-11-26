@@ -1,0 +1,52 @@
+"""
+@文件        :auth.py
+@说明        :{{ description }}
+@时间        :{{ date }}
+@作者        :{{ author }}
+@邮箱        :{{ email }}
+@版本        :{{ version }}
+"""
+
+
+from abc import abstractmethod
+
+from {{ name }}.core.response import unauthentication
+
+
+class UserService:
+    """ """
+
+    @abstractmethod
+    # TODO: 用户后台登录数据查询自行实现
+    def verify_token(*args, **kwargs): ...
+
+
+def login_required(user_keyword):
+    def decorator(func):
+        async def decorator_function(request, *args, **kwargs):
+            service = UserService()
+            state, user = await service.verify_token(request.token)
+            if state:
+                kwargs[user_keyword] = user
+                return await func(request, *args, **kwargs)
+            else:
+                return unauthentication()
+
+        return decorator_function
+
+    return decorator
+
+
+def admin_required():
+    def decorator(func):
+        async def decorator_function(request, *args, **kwargs):
+            service = UserService()
+            state, user = await service.verify_token(request.token)
+            if state and user.is_admin:
+                return await func(request, *args, **kwargs)
+            else:
+                return unauthentication()
+
+        return decorator_function
+
+    return decorator

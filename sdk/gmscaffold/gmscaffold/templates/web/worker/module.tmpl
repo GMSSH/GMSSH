@@ -1,0 +1,22 @@
+"""
+@文件        :module.py
+@说明        :{{ description }}
+@时间        :{{ date }}
+@作者        :{{ author }}
+@邮箱        :{{ email }}
+@版本        :{{ version }}
+"""
+
+from importlib import import_module
+
+from sanic import Sanic
+
+
+def setup_modules(app: Sanic, *module_names: str) -> None:
+    """
+    Load some modules
+    """
+    for module_name in module_names:
+        module = import_module(module_name)
+        if bp := getattr(module, "api", None):
+            app.blueprint(bp)

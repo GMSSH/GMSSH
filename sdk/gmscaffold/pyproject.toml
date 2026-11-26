@@ -1,0 +1,26 @@
+[tool.poetry]
+name = "gmscaffold"
+version = "1.0.9"
+description = "GM Scaffold"
+authors = ["yao <1125564921@qq.com>"]
+license =  "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+pydispatch = "^1.1.0"
+pyfiglet = "^1.0.2"
+jinja2 = "^3.1.4"
+fire = "^0.7.0"
+cleo = "^2.1.0"
+
+[tool.isort]
+profile = "black"
+
+[tool.poetry.scripts]
+gmcli = 'gmscaffold.cmdline:execute'
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

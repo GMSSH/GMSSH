@@ -1,0 +1,26 @@
+"""
+@文件        :exporter.py
+@说明        :{{ description }}
+@时间        :{{ date }}
+@作者        :{{ author }}
+@邮箱        :{{ email }}
+@版本        :{{ version }}
+"""
+
+from typing import Any
+from abc import abstractmethod
+
+class BaseExporter:
+    """基础的数据解析接口
+
+    目前提供了数据的导出方法，
+    可以根据业务场景添加导入方法，等等其它的方法
+    """
+
+    @abstractmethod
+    def export(self):
+        """导出的抽象方法"""
+
+    @abstractmethod
+    def format(self, data: Any):
+        """格式化原生的数据"""

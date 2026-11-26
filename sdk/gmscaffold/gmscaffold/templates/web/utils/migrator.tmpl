@@ -1,0 +1,149 @@
+# -*- encoding: utf-8 -*-
+"""
+@文件        :migrator.py
+@说明        :{{ description }}
+@时间        :{{ date }}
+@作者        :{{ author }}
+@邮箱        :{{ email }}
+@版本        :{{ version }}
+"""
+
+from playhouse.migrate import Field, SqliteMigrator, migrate
+from peewee import (  # type: ignore
+    BooleanField,
+    CharField,
+    DateTimeField,
+    FieldAccessor,
+    IntegerField,
+    Model,
+    ModelSelect,
+    PrimaryKeyField,
+    SqliteDatabase,
+)
+
+
+# +--------------------------------------------------
+# Model migrator
+# +--------------------------------------------------
+class BaseMigrator(object):
+    """ """
+
+    def update_columns(self, model: Model, database: SqliteDatabase):
+        """ """
+        raise NotImplementedError
+
+
+class CustomSqliteMigrator(BaseMigrator):
+    """
+    # The `CustomSqliteMigrator` class provides methods for updating columns in a SQLite database schema
+    # based on changes in a model's fields.
+    """
+
+    def update_columns(self, model: Model, database: SqliteDatabase):
+        """ """
+        self._model, self._database = model, database
+        origin_columns = self.get_origin_columns()
+        new_columns = self.get_now_columns()
+        add_columns = self.diff_add(origin_columns, new_columns)
+        sub_columns = self.diff_sub(origin_columns, new_columns)
+
+        for column in sub_columns:
+            self.drop_column(column)
+
+        for column in add_columns:
+            field = getattr(self._model.__class__, column)
+            self.add_column(column, field)
+
+    # 添加
+    def diff_add(self, origin_columns, new_columns):
+        """ """
+        return set(new_columns) - set(origin_columns)
+
+    # 删除
+    def diff_sub(self, origin_columns, new_columns):
+        """ """
+        return set(origin_columns) - set(new_columns)
+
+    def get_origin_columns(self):
+        """ """
+        columns = self._database.get_columns(self._model._meta.table_name)
+        return [column.name for column in columns]
+
+    def get_now_columns(self):
+        """ """
+        return [
+            x
+            for x, y in vars(self._model.__class__).items()
+            if isinstance(y, FieldAccessor)
+        ]
+
+    def add_column(self, column_name: str, field: Field):
+        """添加字段
+        注意：新增字段需要默认值
+        """
+        with self._database.atomic():
+            migrator = SqliteMigrator(self._database)
+            # 检查列是否存在
+            columns = self.get_origin_columns()
+            enable_column_exist = column_name in columns
+
+            if not enable_column_exist:
+                # enable = SmallIntegerField(null=True, default=1)
+                migrate(
+                    migrator.add_column(
+                        self._model._meta.table_name, column_name, field
+                    ),
+                )
+
+    def drop_column(self, column_name: str, cascade=True):
+        """删除字段"""
+        with self._database.atomic():
+            migrator = SqliteMigrator(self._database)
+            # 检查列是否存在
+            columns = self.get_origin_columns()
+            enable_column_exist = column_name in columns
+
+            if enable_column_exist:
+                migrate(
+                    migrator.drop_column(
+                        self._model._meta.table_name, column_name, cascade
+                    ),
+                )
+
+    def rename_column(self, old_name: str, new_name: str):
+        """字段重命名"""
+        with self._database.atomic():
+            migrator = SqliteMigrator(self._database)
+            # 检查列是否存在
+            columns = self.get_origin_columns()
+            enable_column_exist = old_name in columns
+
+            if enable_column_exist:
+                migrate(
+                    migrator.rename_column(
+                        self._model._meta.table_name, old_name, new_name
+                    ),
+                )
+
+    def alter_column_type(self, column: str, field: Field, cast=None):
+        """更新字段类型"""
+        with self._database.atomic():
+            migrator = SqliteMigrator(self._database)
+            # 检查列是否存在
+            columns = self.get_origin_columns()
+            enable_column_exist = column in columns
+
+            if enable_column_exist:
+                migrate(
+                    migrator.alter_column_type(
+                        self._model._meta.table_name, column, field, cast
+                    ),
+                )
+
+    def drop_not_null(self, column: str):
+        """删除非空字段"""
+        raise NotImplementedError
+
+    def add_not_null(self, column: str):
+        """添加非空字段"""
+        raise NotImplementedError

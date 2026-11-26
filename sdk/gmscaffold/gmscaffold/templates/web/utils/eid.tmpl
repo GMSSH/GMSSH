@@ -1,0 +1,30 @@
+"""
+@文件        :eid.py
+@说明        :{{ description }}
+@时间        :{{ date }}
+@作者        :{{ author }}
+@邮箱        :{{ email }}
+@版本        :{{ version }}
+"""
+
+import uuid
+from string import ascii_letters, digits
+
+REQUEST_ID_ALPHABET = ascii_letters + digits
+REQUEST_ID_ALPHABET_LENGTH = len(REQUEST_ID_ALPHABET)
+
+
+def generate(width: int = 0, fillchar: str = "x") -> str:
+    """
+    Generate a UUID and make is smaller
+    """
+    output = ""
+    uid = uuid.uuid4()
+    num = uid.int
+    while num:
+        num, pos = divmod(num, REQUEST_ID_ALPHABET_LENGTH)
+        output += REQUEST_ID_ALPHABET[pos]
+    eid = output[::-1]
+    if width:
+        eid = eid.rjust(width, fillchar)
+    return eid

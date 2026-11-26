@@ -1,0 +1,108 @@
+"""
+@文件        :default.py
+@说明        :{{ description }}
+@时间        :{{ date }}
+@作者        :{{ author }}
+@邮箱        :{{ email }}
+@版本        :{{ version }}
+"""
+
+#: 默认的配置
+
+import os
+
+
+#: 项目当前的根目录
+BASE_DIR = os.path.abspath(
+    os.path.join(os.path.dirname(os.path.realpath(__file__)), "../")
+)
+
+CSRF_SECRET = "Abc123"
+CSRF_REF_LENGTH = 18
+CSRF_REF_PADDING = 12
+#:Disable or enable access log
+ACCESS_LOG = True
+#:Control whether Sanic Extensions will load if it is in the existing virtual environment
+AUTO_EXTEND = True
+#:Control whether the application will automatically reload when a file changes
+AUTO_RELOAD = True
+#:When True using the app.event() method on a non-existing signal will automatically create it and not raise an exception
+EVENT_AUTOREGISTER = True
+#:Format of error response if an exception is not caught and handled
+FALLBACK_ERROR_FORMAT = "html"
+#:How long a request can take to arrive (sec)
+REQUEST_TIMEOUT = 60
+#:How long a response can take to process (sec)
+RESPONSE_TIMEOUT = 60
+#:Maximum size for incoming messages (bytes)
+WEBSOCKET_MAX_SIZE = 2**20
+#:A Ping frame is sent every ping_interval seconds.
+WEBSOCKET_PING_INTERVAL = 20
+#:Connection is closed when Pong is not received after ping_timeout seconds
+WEBSOCKET_PING_TIMEOUT = 20
+# /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+# 静态资源配置
+# /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+#: web中模板文件存放位置
+TEMPLATE_DIR = os.path.join(BASE_DIR, "templates")
+#: GM的静态文件存放
+GM_STATIC_DIR = os.path.join(TEMPLATE_DIR, "gm")
+#: 静态文件存放位置
+STATIC_DIR = os.path.join(BASE_DIR, "static")
+# /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+# 服务配置
+# /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+#: Sanic服务对外暴露的端口号
+PORT = 8001
+#: Sanic 绑定的host
+HOST = "0.0.0.0"
+#: Sanic是否开启DEBUG模式
+DEBUG = False
+# /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+# 日志配置
+# /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+#: 配置日志的环境(如果没有配置日志等级则根据环境变量选择, 如果配置日志等级则环境变量等级优先级最高)
+#: ENVIRONMENT: 取值范围: local, production, testing, 默认是:local
+#: local: 表示本地开发环境,默认日志不会输出到文件里,只会打印到控制台, 默认日志等级是:DEBUG
+#: production: 表示生产环境,默认日志会输出到文件里, 默认日志等级是:INFO
+#: testing: 表示测试环境,默认日志不会输出到文件里, 默认日志等级是:INFO
+#: 上述的默认配置可以执行根据业务场景进行调整,代码中不允许无条件出现print输出
+ENVIRONMENT = "local"
+#: 配置日志的等级(该配置优先级大于ENVIRONMENT配置中默认的日志等级)
+LOGGING_LEVEL = "DEBUG"
+#: 配置日志的格式化方式
+LOGGING_FORMAT = (
+    "[%(asctime)s] [%(levelname)s] [%(filename)s:%(lineno)s] "
+    "%(request_info)s%(message)s"
+)
+#: 日志中日期格式化配置
+LOGGING_DATEFORMAT = "%Y-%m-%d %H:%M:%S %z"
+#: 日志输出文件名配置
+#: local环境下无文件输出, 配置也无效
+#: production: 环境下文件输出名默认: output.log
+#: testing: 环境下文件输出名默认: test.log
+# LOGGING_FILENAME = ""
+#: 日志输出目录配置
+#: 默认日志输出位置是当前项目根目录下的logs里
+#: 如果配置也是根据环境变量有关系,详解上述
+# LOG_PATH = ""
+# /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+# 跨域配置
+# /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+#:The origins that are allowed to access the resource,
+# as set on the access-control-allow-origin header.
+CORS_ORIGINS = "*"
+#: The HTTP methods that the allowed origins can access,
+# as set on the access-control-allow-methods header.
+CORS_METHODS = ""
+#:	If True, will send the wildcard * origin instead of the origin request header.
+CORS_SEND_WILDCARD = False
+#:Whether to set the access-control-allow-credentials header.
+CORS_SUPPORTS_CREDENTIALS = False
+#:Whether to add vary header, when appropriate.
+CORS_VARY_HEADER = True
+#:The maximum number of seconds the preflight response may be cached using the access-control-max-age header.
+# A falsey value will cause the header to not be set.
+CORS_MAX_AGE = 0
+#: The list of headers that will appear in access-control-allow-headers.
+CORS_ALLOW_HEADERS = "*"

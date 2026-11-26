@@ -1,0 +1,222 @@
+# -*- encoding: utf-8 -*-
+"""
+@文件        :process.py
+@说明        :{{ description }}
+@时间        :{{ date }}
+@作者        :{{ author }}
+@邮箱        :{{ email }}
+@版本        :{{ version }}
+"""
+
+import base64
+import os
+import subprocess
+import threading
+import time
+
+from typing import Callable, Any
+
+from .trace import get_pre_exec_fn, get_error_info
+
+
+async def build_execute_command(command: str, **kwargs):
+    """Note:
+    This will deadlock when using stdout=PIPE or stderr=PIPE and the child process generates enough output to a pipe such that it blocks waiting for the OS pipe buffer to accept more data. Use Popen.communicate() when using pipes to avoid that.
+    """
+
+    def async_exec(exec_cmd: str):
+        subprocess.Popen(
+            exec_cmd,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+            shell=True,
+            **kwargs,
+        )
+
+    name = base64.b64encode(command.encode("utf-8")).decode("utf-8")
+    threading.Thread(target=async_exec, args=(command,), name=name).start()
+
+
+async def check_systemctl_service_status(service_name) -> bool:
+    """
+    执行systemctl命令检查服务状态
+    :param service_name:
+    :return:
+    """
+    command = f"systemctl is-active {service_name}"
+    process = subprocess.Popen(
+        command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE
+    )
+    output, error = process.communicate()
+
+    if process.returncode == 0 and output.decode().strip() == "active":
+        # 服务已启动
+        return True
+    else:
+        # 服务未启动
+        return False
+
+
+async def get_sys_swap() -> str | None:
+    """ """
+    try:
+        res = subprocess.check_output("free -m|grep Swap", shell=True)
+    except subprocess.CalledProcessError as e:
+        return
+    return res.decode()
+
+
+async def check_sudo_permission() -> bool:
+    """ """
+    try:
+        subprocess.check_output('sudo -n echo "Sudo permission granted"', shell=True)
+    except subprocess.CalledProcessError as e:
+        return False
+    return True
+
+
+async def check_command_exists_with_which(command) -> bool:
+    """
+    执行which命令检查命令是否存在
+    :param command:
+    :return:
+    """
+    process = subprocess.Popen(
+        ["which", command], stdout=subprocess.PIPE, stderr=subprocess.PIPE
+    )
+    output, error = process.communicate()
+
+    return process.returncode == 0
+
+
+async def md5(strings):
+    """
+    @name 生成MD5
+    @param strings 要被处理的字符串
+    @return string(32)
+    """
+    if type(strings) != bytes:
+        strings = strings.encode()
+    import hashlib
+
+    m = hashlib.md5()
+    m.update(strings)
+    return m.hexdigest()
+
+
+async def exec_shell(
+    cmd_string,
+    timeout=None,
+    shell: bool = True,
+    cwd: str | None = None,
+    env=None,
+    user: str | None = None,
+    logger_handler: Callable[[Exception], Any] | None = None,
+):
+    """
+    @name 执行命令
+    @param cmd_string 命令 [必传]
+    @param timeout 超时时间
+    @param shell 是否通过shell运行
+    @param cwd 进入的目录
+    @param env 环境变量
+    @param user 执行用户名
+    @return 命令执行结果
+    """
+    import subprocess
+    import tempfile
+
+    pre_exec_fn = None
+    tmp_dir = "/dev/shm"
+    if user:
+        pre_exec_fn = await get_pre_exec_fn(user)
+        tmp_dir = "/tmp"
+    try:
+        rx = md5(cmd_string.encode("utf-8"))
+        success_f = tempfile.SpooledTemporaryFile(
+            max_size=4096,
+            mode="wb+",
+            suffix="_success",
+            prefix=f"b_tex_{rx}",
+            dir=tmp_dir,
+        )
+        error_f = tempfile.SpooledTemporaryFile(
+            max_size=4096,
+            mode="wb+",
+            suffix="_error",
+            prefix=f"b_tex_{rx}",
+            dir=tmp_dir,
+        )
+        sub = subprocess.Popen(
+            cmd_string,
+            close_fds=True,
+            shell=shell,
+            bufsize=128,
+            stdout=success_f,
+            stderr=error_f,
+            cwd=cwd,
+            env=env,
+            preexec_fn=pre_exec_fn,
+        )
+        if timeout:
+            s = 0
+            d = 0.01
+            while sub.poll() is None:
+                time.sleep(d)
+                s += d
+                if s >= timeout:
+                    if not error_f.closed:
+                        error_f.close()
+                    if not success_f.closed:
+                        success_f.close()
+                    return "", "Timed out"
+        else:
+            sub.wait()
+
+        error_f.seek(0)
+        success_f.seek(0)
+        a = success_f.read()
+        e = error_f.read()
+        if not error_f.closed:
+            error_f.close()
+        if not success_f.closed:
+            success_f.close()
+    except Exception as e:
+        if logger_handler is not None:
+            logger_handler(e)
+        return "", await get_error_info()
+    try:
+        # 编码修正
+        if type(a) == bytes:
+            a = a.decode("utf-8")
+        if type(e) == bytes:
+            e = e.decode("utf-8")
+    except Exception as e:
+        if logger_handler is not None:
+            logger_handler(e)
+        a = str(a)
+        e = str(e)
+    return a, e
+
+
+async def check_yum_installed(package_name):
+    """
+    判断 yum 包是否已安装
+    :param package_name:
+    :return:
+    """
+    if package_name == "firewalld":
+        command = f"yum list installed | grep {package_name}|grep -v filesystem"
+    else:
+        command = f"yum list installed | grep {package_name}"
+    process = subprocess.Popen(
+        command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE
+    )
+    output, error = process.communicate()
+
+    if process.returncode == 0 and output.decode().strip().find(package_name) != -1:
+        # 已安装
+        return True
+    else:
+        # 未安装
+        return False

@@ -1,0 +1,57 @@
+"""
+@文件        :mediator.py
+@说明        :{{ description }}
+@时间        :{{ date }}
+@作者        :{{ author }}
+@邮箱        :{{ email }}
+@版本        :{{ version }}
+"""
+
+from {{ name }}.log import logger
+from {{ name }}.app.settings import Settings
+from {{ name }}.app.interfaces.conf import BaseConfig
+from {{ name }}.app.core.driver import DriverFactory
+from {{ name }}.app.utils.defer import Page
+from {{ name }}.app.utils.conf import load_config, ConfigContext
+from {{ name }}.exceptions import SpiderConfigParserError, catch_exception
+from {{ name }}.app.utils.exporter import ExportManager
+
+class Mediator:
+    """该对象用来处理所有的复杂业务逻辑交互"""
+
+    def __init__(self) -> None:
+        """ """
+        self.settings = Settings()
+        self.config = self.load_config()
+        self.driver = self.load_driver()
+
+    @catch_exception(err_type=SpiderConfigParserError)
+    def load_config(self) -> BaseConfig:
+        """记载配置对象"""
+        logger.debug("[*] 加载爬虫配置 ...")
+        config_context = ConfigContext(*self.settings.config_split())
+        return load_config(config_context)
+
+    def load_driver(self):
+        """加载驱动"""
+        driver_fac = DriverFactory()
+        return driver_fac.create_driver(self.config.driver_name)
+
+    def open_page(self, url: str) -> Page:
+        """ """
+        return self.driver.open_page(url)
+
+    def run(self):
+        """ """
+        # TODO: 助兴处理异常捕获参考 load_config
+        page = self.open_page(self.config.visit_login_page)
+        self.driver.login(page, self.config)
+        logger.debug("[*] 登录成功后等待跳转中...")
+        page = self.open_page(self.config.visit_domain_page)
+        domains = self.driver.get_domains(page, self.config)
+        logger.debug("[*] 获取列表成功...")
+        # 存储处理
+        exporter = ExportManager(self.config).create_export()
+        data = exporter.format(domains)
+        exporter.export(data)
+        logger.debug("[*] 数据已经导出成功...")

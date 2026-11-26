@@ -1,0 +1,201 @@
+"""
+@文件        :status_code.py
+@说明        :{{ description }}
+@时间        :{{ date }}
+@作者        :{{ author }}
+@邮箱        :{{ email }}
+@版本        :{{ version }}
+"""
+
+#: 错误状态码工具
+
+import enum
+
+
+# 常量配置
+class StatusInt(int):
+    """ """
+
+    def to_string(self):
+        """TODO: 状态码转成描述信息"""
+        raise NotImplementedError
+
+
+class StatusCode(StatusInt, enum.Enum):
+    """错误状态码"""
+
+    OK: StatusInt = StatusInt(100200)
+    CREATED: StatusInt = StatusInt(100201)
+    ACCEPTED: StatusInt = StatusInt(100202)
+    NO_AUTHORITATIVE_INFO: StatusInt = StatusInt(100203)
+    NO_CONTENT: StatusInt = StatusInt(100204)
+    RESET_CONTENT: StatusInt = StatusInt(100205)
+    TERMINAL: StatusInt = StatusInt(100206)
+    MULTI_STATUS: StatusInt = StatusInt(100207)
+    ALREADY_REPORTED: StatusInt = StatusInt(100208)
+    AUTHORITATIVE_FAILED_INFO: StatusInt = StatusInt(100209)
+    PARTIAL_CONTENT: StatusInt = StatusInt(100210)
+    IM_USED: StatusInt = StatusInt(100226)
+    MULTIPLE_CHOICES: StatusInt = StatusInt(100300)
+    MOVED_PERMANENTLY: StatusInt = StatusInt(100301)
+    STATUS_FOUND: StatusInt = StatusInt(100302)
+    SEE_OTHER: StatusInt = StatusInt(100303)
+    NOT_MODIFIED: StatusInt = StatusInt(100304)
+    USE_PROXY: StatusInt = StatusInt(100305)
+    TEMPORARY_REDIRECT: StatusInt = StatusInt(100307)
+    PERMANENT_REDIRECT: StatusInt = StatusInt(100308)
+    BAD_REQUEST: StatusInt = StatusInt(100400)
+    UNAUTHORIZED: StatusInt = StatusInt(100401)
+    PAYMENT_REQUIRED: StatusInt = StatusInt(100402)
+    FORBIDDEN: StatusInt = StatusInt(100403)
+    NOT_FOUND: StatusInt = StatusInt(100404)
+    METHOD_NOT_ALLOWED: StatusInt = StatusInt(100405)
+    NOT_ACCEPTABLE: StatusInt = StatusInt(100406)
+    PROXY_AUTHENTICATION_REQUIRED: StatusInt = StatusInt(100407)
+    REQUEST_TIMEOUT: StatusInt = StatusInt(100408)
+    CONFLICT: StatusInt = StatusInt(100409)
+    GONE: StatusInt = StatusInt(100410)
+    LENGTH_REQUIRED: StatusInt = StatusInt(100411)
+    PRECONDITION_FAILED: StatusInt = StatusInt(100412)
+    PAYLOAD_TOO_LARGE: StatusInt = StatusInt(100413)
+    REQUEST_URI_TOO_LONG: StatusInt = StatusInt(100414)
+    UNSUPPORTED_MEDIA_TYPE: StatusInt = StatusInt(100415)
+    REQUESTED_RANGE_NOT_SATISFIABLE: StatusInt = StatusInt(100416)
+    EXPECTATION_FAILED: StatusInt = StatusInt(100417)
+    TEAPOT: StatusInt = StatusInt(100418)
+    CMD_STATUS_CODE: StatusInt = StatusInt(100421)
+    UNPROCESSABLE_ENTITY: StatusInt = StatusInt(100422)
+    LOCKED: StatusInt = StatusInt(100423)
+    FAILED_DEPENDENCY: StatusInt = StatusInt(100424)
+    TOO_EARLY: StatusInt = StatusInt(100425)
+    UPGRADE_REQUIRED: StatusInt = StatusInt(100426)
+    PRECONDITION_REQUIRED: StatusInt = StatusInt(100428)
+    TOO_MANY_REQUESTS: StatusInt = StatusInt(100429)
+    REQUEST_HEADER_FIELDS_TOO_LARGE: StatusInt = StatusInt(100431)
+    UNAVAILABLE_FOR_LEGAL_REASONS: StatusInt = StatusInt(100451)
+    INTERNAL_SERVER_ERROR: StatusInt = StatusInt(100500)
+    NOT_IMPLEMENTED: StatusInt = StatusInt(100501)
+    BAD_GATEWAY: StatusInt = StatusInt(100502)
+    SERVICE_UNAVAILABLE: StatusInt = StatusInt(100503)
+    GATEWAY_TIMEOUT: StatusInt = StatusInt(100504)
+    HTTP_VERSION_NOT_SUPPORTED: StatusInt = StatusInt(100505)
+    VARIANT_ALSO_NEGOTIATES: StatusInt = StatusInt(100506)
+    INSUFFICIENT_STORAGE: StatusInt = StatusInt(100507)
+    LOOP_DETECTED: StatusInt = StatusInt(100508)
+    BANDWIDTH_LIMIT_EXCEEDED: StatusInt = StatusInt(100509)
+    NOT_EXTENDED: StatusInt = StatusInt(100510)
+    NETWORK_AUTHENTICATION_REQUIRED: StatusInt = StatusInt(100511)
+
+
+# +----------------------------
+#  模板定义
+# +----------------------------
+class _StatusCodeTemplate:
+    """ """
+
+    def __init__(self) -> None:
+        """ """
+        self._tmp = {}
+
+    def add_tmp(self, key: str, value: str):
+        """ """
+        self._tmp[key] = value
+
+    def get_i18n_tmp(self, key: StatusInt) -> str | None:
+        """ """
+        return self._tmp.get(key)
+
+
+StatusCodeTemplate = _StatusCodeTemplate()
+StatusCodeTemplate.add_tmp(StatusCode.OK, "STATUS_OK")
+StatusCodeTemplate.add_tmp(StatusCode.CREATED, "STATUS_CREATED")
+StatusCodeTemplate.add_tmp(StatusCode.ACCEPTED, "STATUS_ACCEPTED")
+StatusCodeTemplate.add_tmp(
+    StatusCode.NO_AUTHORITATIVE_INFO, "STATUS_NO_AUTHORITATIVE_INFO"
+)
+StatusCodeTemplate.add_tmp(StatusCode.NO_CONTENT, "STATUS_NO_CONTENT")
+StatusCodeTemplate.add_tmp(StatusCode.RESET_CONTENT, "STATUS_RESET_CONTENT")
+StatusCodeTemplate.add_tmp(StatusCode.TERMINAL, "STATUS_TERMINAL")
+StatusCodeTemplate.add_tmp(StatusCode.MULTI_STATUS, "STATUS_MULTI_STATUS")
+StatusCodeTemplate.add_tmp(StatusCode.ALREADY_REPORTED, "STATUS_ALREADY_REPORTED")
+StatusCodeTemplate.add_tmp(
+    StatusCode.AUTHORITATIVE_FAILED_INFO, "STATUS_AUTHORITATIVE_FAILED_INFO"
+)
+StatusCodeTemplate.add_tmp(StatusCode.PARTIAL_CONTENT, "STATUS_PARTIAL_CONTENT")
+StatusCodeTemplate.add_tmp(StatusCode.IM_USED, "STATUS_IM_USED")
+StatusCodeTemplate.add_tmp(StatusCode.MULTIPLE_CHOICES, "STATUS_MULTIPLE_CHOICES")
+StatusCodeTemplate.add_tmp(StatusCode.MOVED_PERMANENTLY, "STATUS_MOVED_PERMANENTLY")
+StatusCodeTemplate.add_tmp(StatusCode.STATUS_FOUND, "STATUS_STATUS_FOUND")
+StatusCodeTemplate.add_tmp(StatusCode.SEE_OTHER, "STATUS_SEE_OTHER")
+StatusCodeTemplate.add_tmp(StatusCode.NOT_MODIFIED, "STATUS_NOT_MODIFIED")
+StatusCodeTemplate.add_tmp(StatusCode.USE_PROXY, "STATUS_USE_PROXY")
+StatusCodeTemplate.add_tmp(StatusCode.TEMPORARY_REDIRECT, "STATUS_TEMPORARY_REDIRECT")
+StatusCodeTemplate.add_tmp(StatusCode.PERMANENT_REDIRECT, "STATUS_PERMANENT_REDIRECT")
+StatusCodeTemplate.add_tmp(StatusCode.BAD_REQUEST, "STATUS_BAD_REQUEST")
+StatusCodeTemplate.add_tmp(StatusCode.UNAUTHORIZED, "STATUS_UNAUTHORIZED")
+StatusCodeTemplate.add_tmp(StatusCode.PAYMENT_REQUIRED, "STATUS_PAYMENT_REQUIRED")
+StatusCodeTemplate.add_tmp(StatusCode.FORBIDDEN, "STATUS_FORBIDDEN")
+StatusCodeTemplate.add_tmp(StatusCode.NOT_FOUND, "STATUS_NOT_FOUND")
+StatusCodeTemplate.add_tmp(StatusCode.METHOD_NOT_ALLOWED, "STATUS_METHOD_NOT_ALLOWED")
+StatusCodeTemplate.add_tmp(StatusCode.NOT_ACCEPTABLE, "STATUS_NOT_ACCEPTABLE")
+StatusCodeTemplate.add_tmp(
+    StatusCode.PROXY_AUTHENTICATION_REQUIRED, "STATUS_PROXY_AUTHENTICATION_REQUIRED"
+)
+StatusCodeTemplate.add_tmp(StatusCode.REQUEST_TIMEOUT, "STATUS_REQUEST_TIMEOUT")
+StatusCodeTemplate.add_tmp(StatusCode.CONFLICT, "STATUS_CONFLICT")
+StatusCodeTemplate.add_tmp(StatusCode.GONE, "STATUS_GONE")
+StatusCodeTemplate.add_tmp(StatusCode.LENGTH_REQUIRED, "STATUS_LENGTH_REQUIRED")
+StatusCodeTemplate.add_tmp(StatusCode.PRECONDITION_FAILED, "STATUS_PRECONDITION_FAILED")
+StatusCodeTemplate.add_tmp(StatusCode.PAYLOAD_TOO_LARGE, "STATUS_PAYLOAD_TOO_LARGE")
+StatusCodeTemplate.add_tmp(
+    StatusCode.REQUEST_URI_TOO_LONG, "STATUS_REQUEST_URI_TOO_LONG"
+)
+StatusCodeTemplate.add_tmp(
+    StatusCode.UNSUPPORTED_MEDIA_TYPE, "STATUS_UNSUPPORTED_MEDIA_TYPE"
+)
+StatusCodeTemplate.add_tmp(
+    StatusCode.REQUESTED_RANGE_NOT_SATISFIABLE, "STATUS_REQUESTED_RANGE_NOT_SATISFIABLE"
+)
+StatusCodeTemplate.add_tmp(StatusCode.EXPECTATION_FAILED, "STATUS_EXPECTATION_FAILED")
+StatusCodeTemplate.add_tmp(StatusCode.TEAPOT, "STATUS_TEAPOT")
+StatusCodeTemplate.add_tmp(StatusCode.CMD_STATUS_CODE, "STATUS_CMD_STATUS_CODE")
+StatusCodeTemplate.add_tmp(
+    StatusCode.UNPROCESSABLE_ENTITY, "STATUS_UNPROCESSABLE_ENTITY"
+)
+StatusCodeTemplate.add_tmp(StatusCode.LOCKED, "STATUS_LOCKED")
+StatusCodeTemplate.add_tmp(StatusCode.FAILED_DEPENDENCY, "STATUS_FAILED_DEPENDENCY")
+StatusCodeTemplate.add_tmp(StatusCode.TOO_EARLY, "STATUS_TOO_EARLY")
+StatusCodeTemplate.add_tmp(StatusCode.UPGRADE_REQUIRED, "STATUS_UPGRADE_REQUIRED")
+StatusCodeTemplate.add_tmp(
+    StatusCode.PRECONDITION_REQUIRED, "STATUS_PRECONDITION_REQUIRED"
+)
+StatusCodeTemplate.add_tmp(
+    StatusCode.REQUEST_HEADER_FIELDS_TOO_LARGE, "STATUS_REQUEST_HEADER_FIELDS_TOO_LARGE"
+)
+StatusCodeTemplate.add_tmp(
+    StatusCode.UNAVAILABLE_FOR_LEGAL_REASONS, "STATUS_UNAVAILABLE_FOR_LEGAL_REASONS"
+)
+StatusCodeTemplate.add_tmp(
+    StatusCode.INTERNAL_SERVER_ERROR, "STATUS_INTERNAL_SERVER_ERROR"
+)
+StatusCodeTemplate.add_tmp(StatusCode.NOT_IMPLEMENTED, "STATUS_NOT_IMPLEMENTED")
+StatusCodeTemplate.add_tmp(StatusCode.BAD_GATEWAY, "STATUS_BAD_GATEWAY")
+StatusCodeTemplate.add_tmp(StatusCode.SERVICE_UNAVAILABLE, "STATUS_SERVICE_UNAVAILABLE")
+StatusCodeTemplate.add_tmp(StatusCode.GATEWAY_TIMEOUT, "STATUS_GATEWAY_TIMEOUT")
+StatusCodeTemplate.add_tmp(
+    StatusCode.HTTP_VERSION_NOT_SUPPORTED, "STATUS_HTTP_VERSION_NOT_SUPPORTED"
+)
+StatusCodeTemplate.add_tmp(
+    StatusCode.VARIANT_ALSO_NEGOTIATES, "STATUS_VARIANT_ALSO_NEGOTIATES"
+)
+StatusCodeTemplate.add_tmp(
+    StatusCode.INSUFFICIENT_STORAGE, "STATUS_INSUFFICIENT_STORAGE"
+)
+StatusCodeTemplate.add_tmp(StatusCode.LOOP_DETECTED, "STATUS_LOOP_DETECTED")
+StatusCodeTemplate.add_tmp(
+    StatusCode.BANDWIDTH_LIMIT_EXCEEDED, "STATUS_BANDWIDTH_LIMIT_EXCEEDED"
+)
+StatusCodeTemplate.add_tmp(StatusCode.NOT_EXTENDED, "STATUS_NOT_EXTENDED")
+StatusCodeTemplate.add_tmp(
+    StatusCode.NETWORK_AUTHENTICATION_REQUIRED, "STATUS_NETWORK_AUTHENTICATION_REQUIRED"
+)

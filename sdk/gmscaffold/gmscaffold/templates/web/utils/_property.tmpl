@@ -1,0 +1,21 @@
+# -*- encoding: utf-8 -*-
+"""
+@文件        :_property.py
+@说明        :{{ description }}
+@时间        :{{ date }}
+@作者        :{{ author }}
+@邮箱        :{{ email }}
+@版本        :{{ version }}
+"""
+
+
+class classproperty:
+    """A decorator that defines a property on a class rather than an instance"""
+
+    def __init__(self, fget) -> None:
+        """Initialize the classproperty with the provided getter function (fget)"""
+        self.fget = fget
+
+    def __get__(self, instance, owner):
+        """Get the attribute of the owner class using the provided getter function"""
+        return self.fget(owner)

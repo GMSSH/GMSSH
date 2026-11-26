@@ -1,0 +1,139 @@
+# -*- encoding: utf-8 -*-
+"""
+@文件        :IniUtils.py
+@说明        :{{ description }}
+@时间        :{{ date }}
+@作者        :{{ author }}
+@邮箱        :{{ email }}
+@版本        :{{ version }}
+"""
+
+# Import the necessary libraries
+import configparser
+
+
+# Define a class named CustomIniConfig, inheriting from the dictionary type
+class CustomIniConfig(dict):
+    """ """
+
+    # Initialize method, accepts a file path parameter
+    def __init__(self, file_path=None):
+        """ """
+        # If the file path parameter is not empty, assign it to the file_path attribute
+        if file_path is not None:
+            self.file_path = file_path
+
+    # Method to read the file and create a dictionary
+    def read(self, file_path):
+        """ """
+        # Assign the file path parameter to the file_path attribute
+        self.file_path = file_path
+        # Return the created dictionary
+        return self.__create_dict()
+
+    # Method to create the dictionary from the file
+    def __create_dict(self):
+        """ """
+        # Open the file in read mode
+        with open(self.file_path, "r", encoding="utf-8") as f:
+            # Initialize an empty dictionary
+            variables = {}
+            # Iterate over each line in the file
+            for line in f.readlines():
+                # Update the dictionary with the parsed line
+                variables.update(self.__parse_line(line))
+            # Return the created dictionary
+            return variables
+
+    # Method to parse a line from the file
+    def __parse_line(self, line):
+        """ """
+        # If the line starts with a comment symbol, discard it and return an empty dictionary
+        if line.lstrip().startswith("#"):
+            return {}
+        # If the line is not empty
+        if line.lstrip():
+            # Find the second occurrence of a quote mark
+            quote_delimit = max(line.find("'", line.find("'") + 1), line.find('"', line.rfind('"')) + 1)
+            # Find the first comment mark after the second quote mark
+            comment_delimit = line.find("#", quote_delimit)
+            # Trim the line and split it into key and value
+            key, value = map(lambda x: x.strip().strip("'").strip('"'), line.split("=", 1))
+            # Return a dictionary with the key and value
+            return {key: value}
+        else:
+            # Return an empty dictionary
+            return {}
+
+    # Method to persist the changes to the file
+    def __persist(self):
+        """ """
+        # Open the file in write mode
+        with open(self.file_path, "w") as f:
+            # Iterate over each key-value pair in the dictionary
+            for key, value in self.items():
+                # Write the key and value to the file, separated by an equal sign
+                f.write("%s=%s\n" % (key, value))
+
+    # Method to set a value for a key in the dictionary
+    def __setitem__(self, key, value):
+        """ """
+        # Call the parent class's __setitem__ method to set the value for the key
+        super(CustomIniConfig, self).__setitem__(key, value)
+        # Persist the changes to the file
+        self.__persist()
+
+    # Method to delete a key from the dictionary
+    def __delitem__(self, key):
+        """ """
+        # Call the parent class's __delitem__ method to delete the key
+        super(CustomIniConfig, self).__delitem__(key)
+        # Persist the changes to the file
+        self.__persist()
+
+
+# Define a class named IniConfigParser
+class IniConfigParser:
+    """ """
+
+    # Initialize method
+    def __init__(self) -> None:
+        """ """
+        # Initialize an instance of the ConfigParser class
+        self.config = configparser.ConfigParser()
+
+    # Method to read the file
+    def read(self, file: str):
+        """ """
+        # Check if the file has a valid suffix
+        suffix_name = file.split(".", maxsplit=1)[-1]
+        if suffix_name not in ["ini"]:
+            # Raise a ValueError if the file type is invalid
+            raise ValueError("Invalid file type!")
+        # Read the file using the ConfigParser instance
+        self.config.read(file)
+        # Return the instance
+        return self
+
+    def get(self, key: str):
+        """ """
+        return self.config.get(key)
+
+
+# Define a class named IniUtils
+class IniUtils:
+    """ """
+
+    # Initialize method
+    def __init__(self) -> None:
+        """
+        Initialize an instance of the CustomIniConfig class and assign it to the config attribute
+        """
+        self.config = CustomIniConfig()
+
+    # Method to dynamically retrieve an attribute
+    def __getattr__(self, __name: str):
+        """
+        If the attribute is not found in the IniUtils instance, try to retrieve it from the config attribute
+        """
+        return getattr(self.config, __name)

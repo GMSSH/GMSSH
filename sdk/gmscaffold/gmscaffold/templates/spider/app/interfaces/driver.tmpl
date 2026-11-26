@@ -1,0 +1,17 @@
+"""
+@文件        :alarm.py
+@说明        :{{ description }}
+@时间        :{{ date }}
+@作者        :{{ author }}
+@邮箱        :{{ email }}
+@版本        :{{ version }}
+"""
+
+from abc import abstractmethod
+
+class BaseDriver:
+    """基础驱动接口"""
+
+    @abstractmethod
+    def open_page(self, url: str):
+        """访问页面"""

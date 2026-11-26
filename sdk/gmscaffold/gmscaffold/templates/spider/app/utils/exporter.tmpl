@@ -1,0 +1,81 @@
+"""
+@文件        :exporter.py
+@说明        :{{ description }}
+@时间        :{{ date }}
+@作者        :{{ author }}
+@邮箱        :{{ email }}
+@版本        :{{ version }}
+"""
+
+from typing import Any
+from dataclasses import asdict
+
+from {{ name }}.log import logger
+from {{ name }}.app.interfaces.item import BaseItem
+from {{ name }}.app.entities.item import DomainItem
+from {{ name }}.app.interfaces.exporter import BaseExporter
+
+# TODO: 案例仅供参考
+class ExportXLSX(BaseExporter):
+    """数据存储成xlsx类型
+
+    结合数据字段完成数据的导入导出
+    数据处理主要是面向数据到输入和输出
+    """
+
+    def format(self, data) -> BaseItem:
+        """format"""
+        # TODO: 案例仅供参考
+        logger.debug("[ExportXLSX] 数据格式化中 ...")
+        return DomainItem(
+            name="test.domain.cn",
+            price="100.00",
+            description="测试数据",
+            category="一口价",
+            start_date="20240506",
+            end_date="20241006",
+        )
+
+    def export(self, item: BaseItem):
+        """导出的实现"""
+        # TODO: 案例仅供参考
+        print("[xlsx] >>>> 数据导出中...", asdict(item))
+
+
+class ExportCSV(BaseExporter):
+    """输出导出csv类型"""
+
+    def format(self, data) -> BaseItem:
+        """format"""
+        # TODO: 案例仅供参考
+        logger.debug("[ExportCSV] 数据格式化中 ...")
+        return DomainItem(
+            name="test.domain.cn",
+            price="100.00",
+            description="测试数据",
+            category="一口价",
+            start_date="20240506",
+            end_date="20241006",
+        )
+
+    def export(self, item: BaseItem):
+        """导出的实现"""
+        # TODO: 案例仅供参考
+        print("[csv] >>>> 数据导出中...", asdict(item))
+
+
+class ExportManager(BaseExporter):
+    """ """
+    def __init__(self, context: Any) -> None:
+        """ """
+        self.context = context
+
+    def create_export(self, export_type="xlsx") -> BaseExporter:
+        """创建导出的对象"""
+        match export_type:
+            case "xlsx":
+                return ExportXLSX()
+            case "csv":
+                return ExportCSV()
+            case _:
+                return ExportCSV()

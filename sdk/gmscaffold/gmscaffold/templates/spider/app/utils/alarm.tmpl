@@ -1,0 +1,18 @@
+"""
+@文件        :alarm.py
+@说明        :{{ description }}
+@时间        :{{ date }}
+@作者        :{{ author }}
+@邮箱        :{{ email }}
+@版本        :{{ version }}
+"""
+
+from {{ name }}.app.interfaces.alarm import BaseAlarm
+
+class DingDingAlarm(BaseAlarm):
+    """ """
+
+    def alarm(self, message: str):
+        """ """
+        # TODO: 自行实现逻辑
+        logger.info("[*] DingDingAlarm alarm ...")

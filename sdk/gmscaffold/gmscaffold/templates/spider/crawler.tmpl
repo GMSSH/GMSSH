@@ -1,0 +1,36 @@
+"""
+@文件        :crawler.py
+@说明        :{{ description }}
+@时间        :{{ date }}
+@作者        :{{ author }}
+@邮箱        :{{ email }}
+@版本        :{{ version }}
+"""
+import os
+import sys
+
+execute_path = os.path.dirname(os.path.dirname(__file__))
+sys.path.append(execute_path)
+
+
+from {{ name }}.log import logger
+from {{ name }}.app.mediator import Mediator
+
+class {{ name | to_capitalize }}Main:
+    """爬虫入口"""
+
+    def __init__(self) -> None:
+        """ """
+        self.mediator = Mediator()
+
+    def start(self):
+        """ """
+        logger.debug("[*] main 爬虫脚本启动...")
+        self.mediator.run()
+        logger.debug("[*] main 爬虫脚本执行完成...")
+
+
+if __name__ == "__main__":
+    """ """
+    spider_main = {{ name | to_capitalize }}Main()
+    spider_main.start()

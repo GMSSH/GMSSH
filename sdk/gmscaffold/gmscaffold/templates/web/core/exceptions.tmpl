@@ -1,0 +1,159 @@
+"""
+@文件        :exceptions.py
+@说明        :{{ description }}
+@时间        :{{ date }}
+@作者        :{{ author }}
+@邮箱        :{{ email }}
+@版本        :{{ version }}
+"""
+
+#: 异常类封装地方
+
+from functools import partial, wraps
+from typing import Any, Optional, Union, Dict, TypeVar
+
+from sanic import exceptions
+from .i18n import TranslateBase
+from .i18n import T as i18n
+from .status_code import StatusCode
+
+TranslateT = TypeVar("TranslateT", bound=TranslateBase)
+
+
+class ErrorMessageFormat:
+    """ """
+
+    def format(self, message: str) -> str:
+        """ """
+        return message
+
+
+class ErrorMessageI18nHandlerFormat(ErrorMessageFormat):
+    """ """
+
+    def __init__(self, translate: Optional[TranslateT] = i18n):
+        """ """
+        self.translate = translate
+
+    def format(self, message: str) -> str:
+        """ """
+        return self.translate.translate(message)
+
+
+class BaseServerError(exceptions.SanicException):
+    """
+    Dynamic and predictable message using extra
+    Sanic exceptions can be raised using extra keyword arguments to provide additional information to a raised exception instance.
+
+    .. note::
+        class TeapotError(SanicException):
+            status_code = 418
+
+            @property
+            def message(self):
+                return f"Sorry {self.extra['name']}, I cannot make you coffee"
+        raise TeapotError(extra={"name": "Adam"})
+    """
+
+    data: Optional[Any] = None
+    i18n = False
+
+    def __init__(
+        self,
+        message: Optional[Union[str, bytes]] = None,
+        status_code: Optional[int] = None,
+        data: Optional[int] = None,
+        *,
+        quiet: Optional[bool] = None,
+        i18n: Optional[bool] = False,
+        context: Optional[Dict[str, Any]] = None,
+        extra: Optional[Dict[str, Any]] = None,
+        headers: Optional[Dict[str, str]] = None,
+        eMsgFormat: Optional[ErrorMessageFormat] = ErrorMessageFormat,
+    ) -> None:
+        super().__init__(
+            message=message,
+            status_code=status_code,
+            quiet=quiet,
+            context=context,
+            extra=extra,
+            headers=headers,
+        )
+        self.data = data
+        self.i18n = i18n
+        self.eMsgFormat = eMsgFormat
+
+        match self.i18n:
+            case False:
+                self.eMsgFormat = ErrorMessageFormat()
+            case True:
+                self.eMsgFormat = ErrorMessageI18nHandlerFormat()
+            case _:
+                self.eMsgFormat = ErrorMessageFormat()
+
+    def _fmt_message(self, message) -> str:
+        """ """
+        return self.eMsgFormat.format(message)
+
+    def to_dict(self):
+        """ """
+        return {
+            "status_code": self.status_code,
+            "data": self.data,
+            "message": self._fmt_message(self.message),
+        }
+
+
+class SilentError(BaseServerError):
+    """Example:
+    By default, exceptions will be output by Sanic to the error_logger.
+    Sometimes this may not be desirable,
+    especially if you are using exceptions to trigger events in exception handlers (see the following section).
+    You can suppress the log output using quiet=True.
+
+    Sometimes while debugging you may want to globally ignore the quiet=True property.
+    You can force Sanic to log out all exceptions regardless of this property using NOISY_EXCEPTIONS
+    """
+
+    message = "Something happened, but not shown in logs"
+    quiet = True
+
+
+class ValueError(BaseServerError): ...
+
+
+class TypeError(BaseServerError): ...
+
+
+class ValidationError(BaseServerError):
+    status_code = StatusCode.BAD_REQUEST
+
+
+class FieldError(ValidationError): ...
+
+
+class FieldTypeError(ValidationError): ...
+
+
+class FieldAttributeError(ValidationError): ...
+
+
+class FieldValidateError(FieldError): ...
+
+
+def catch_except_resp(fn=None, exec_type: BaseServerError = None):
+    """ """
+    if fn is None:
+        return partial(catch_except_resp, exec_type=exec_type)
+
+    @wraps(fn)
+    def inner(*args, **kwargs):
+        """ """
+        try:
+            return fn(*args, **kwargs)
+        except exec_type as e:
+            if isinstance(exec_type, BaseServerError):
+                return e.to_dict()
+            raise e
+
+    return inner
