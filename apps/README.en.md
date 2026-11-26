@@ -1,5 +1,7 @@
 # 🚀 GMSSH Apps Center
 
+<p align="center"><a href="./README.md">简体中文</a> | <strong>English</strong></p>
+
 [**Official Native Apps**] · [**Community Extensions**] · [**Maintenance Tools**]
 
 Welcome to the **GMSSH Apps & Extensions Center**. This repository is a curated collection of high-performance plugins, environment stacks, and DevOps tools designed to supercharge your GMSSH experience.
