@@ -2,6 +2,11 @@
 
 # GMSSH
 
+> **GMSSH (极目桌面) ecosystem** · Website <https://www.gm.cn> · Docs <https://doc.gm.cn> · Community <https://hub.gm.cn>
+>
+> This repository is the **developer hub** of the GMSSH ecosystem: application SDKs, the `gmcli` scaffold, the App Center index, and app examples. The GMSSH desktop client itself is closed-source — get it at the website above.
+
+
 ### Manage Linux servers like Windows — without installing a desktop environment.
 
 #### An SSH-based desktop workspace that makes Linux servers simple, secure, intelligent, and accessible.
@@ -296,3 +301,23 @@ If GMSSH helps you, please consider giving the project a Star ✨.
 ---
 
 *GMSSH Team*
+
+
+## Repository Structure
+
+| Directory | Contents |
+|---|---|
+| `sdk/` | Developer SDKs — [app-sdk-py](sdk/app-sdk-py/) (simplejrpc, Python backend), [gmscaffold](sdk/gmscaffold/) (gmcli CLI tool), `gmssh-front-sdk` (npm `gm-app-sdk`), `gmssh-app-skeleton-go` |
+| `apps/` | App Center index — installable applications for GMSSH |
+| `examples/` | Application examples (web-html / web-vue / python) |
+
+## Ecosystem
+
+| Repository | What it is |
+|---|---|
+| [app_template](https://github.com/GMSSH/app_template) | Micro-app templates — every branch is a complete app (port map, system score, SSH footprint, attack radar, domain toolbox, webmaster toolbox) |
+| [rea](https://github.com/GMSSH/rea) | Reverse Engineer Anything — one MCP for reverse engineering across binaries |
+| [DBStudio](https://github.com/GMSSH/DBStudio) | Web-based MySQL manager for GMSSH (Navicat-like) |
+| [GMClaw](https://github.com/GMSSH/GMClaw) | Personal AI assistant built on the GMSSH ecosystem |
+| [nginx-manager](https://github.com/GMSSH/nginx-manager) | Nginx install/config/monitor tool (Python + SimpleJRPC) |
+| [dock-speed-v8](https://github.com/GMSSH/dock-speed-v8) | Public Docker/GHCR mirror accelerator for Chinese developers |
