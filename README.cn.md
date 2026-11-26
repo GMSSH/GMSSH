@@ -3,6 +3,11 @@
 
 # 极目Linux桌面
 
+> **GMSSH（极目桌面）生态** · 官网 <https://www.gm.cn> · 文档 <https://doc.gm.cn> · 社区 <https://hub.gm.cn>
+>
+> 本仓库是 GMSSH 生态的**开发者入口**：应用 SDK、`gmcli` 脚手架、应用中心索引与应用示例。GMSSH 桌面客户端本体闭源，请从官网获取。
+
+
 ### 无需安装桌面环境，通过 SSH 连接即可像使用 Windows 一样管理 Linux 服务器。
 
 #### 简单、安全、智能的桌面端可视化交互界面，帮您轻松掌握Linux服务器
@@ -283,3 +288,23 @@
    <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=GMSSH/GMSSH%5C%2Cgmssh/gmssh&type=date&legend=bottom-right" />
  </picture>
 </a>
+
+
+## 仓库结构
+
+| 目录 | 内容 |
+|---|---|
+| `sdk/` | 开发者 SDK —— [app-sdk-py](sdk/app-sdk-py/)（simplejrpc，Python 后端）、[gmscaffold](sdk/gmscaffold/)（gmcli 脚手架）、`gmssh-front-sdk`（npm `gm-app-sdk`）、`gmssh-app-skeleton-go` |
+| `apps/` | 应用中心索引 —— GMSSH 可安装应用列表 |
+| `examples/` | 应用示例（web-html / web-vue / python） |
+
+## 生态仓库
+
+| 仓库 | 是什么 |
+|---|---|
+| [app_template](https://github.com/GMSSH/app_template) | 微应用模板 —— 每个分支是一个完整应用（端口地图/系统跑分/SSH足迹/攻击雷达/域名工具箱/站长工具箱） |
+| [rea](https://github.com/GMSSH/rea) | 逆向工程 MCP「Reverse Engineer Anything」 |
+| [DBStudio](https://github.com/GMSSH/DBStudio) | GMSSH 的 MySQL 管理应用（类 Navicat） |
+| [GMClaw](https://github.com/GMSSH/GMClaw) | GMSSH 生态个人 AI 助手 |
+| [nginx-manager](https://github.com/GMSSH/nginx-manager) | Nginx 安装/配置/监控工具（Python + SimpleJRPC） |
+| [dock-speed-v8](https://github.com/GMSSH/dock-speed-v8) | 公益 Docker/GHCR 镜像加速站 |
