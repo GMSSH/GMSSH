@@ -1,0 +1,8 @@
+app:
+  name: example
+  port: 8080
+  log_level: INFO
+  version: 1.0.0
+meta:
+  org: example-org
+  author: your-name
