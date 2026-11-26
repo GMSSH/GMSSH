@@ -1,0 +1,34 @@
+repos:
+  - repo: local
+    # rev: v2.3.1
+    hooks:
+    - id: autoflake
+      name: autoflake
+      additional_dependencies: [autoflake]
+      entry: autoflake
+      language: python
+      # language_version: python3.10.10
+      args: [--remove-all-unused-imports, --remove-duplicate-keys, --expand-star-imports, --in-place, --recursive]
+#   - repo: local
+#     # rev: 22.8.0
+#     hooks:
+#     - id: black
+#       name: black
+#       entry: black
+#       language: python
+#       types: [python]
+#       exclude: '\.gitignore$'
+#       args: [--line-length=120]
+  - repo: local
+    # rev: 5.13.2
+    hooks:
+      - id: isort
+        name: isort
+        entry: isort
+        language: python
+        args: ["--profile", "black", "--filter-files"]
+  # - repo: https://github.com/pre-commit/mirrors-mypy
+  #   rev: v0.790
+  #   hooks:
+  #     - id: mypy
+  #       args: [--strict, --ignore-missing-imports]

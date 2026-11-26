@@ -1,0 +1,5 @@
+jsonrpcclient==4.0.3
+jsonrpcserver==5.0.9
+loguru==0.7.3
+PyYAML==6.0.2
+WTForms==3.2.1
