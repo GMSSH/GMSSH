@@ -298,6 +298,25 @@
 | `apps/` | 应用中心索引 —— GMSSH 可安装应用列表 |
 | `examples/` | 应用示例（web-html / web-vue / python） |
 
+```text
+GMSSH/
+├── README.md / README.cn.md        # 英文 / 中文说明
+├── sdk/                            # 开发者 SDK
+│   ├── app-sdk-py/                 # Python 后端 SDK（simplejrpc，已上 PyPI）
+│   └── gmscaffold/                 # 脚手架 CLI（gmcli，已上 PyPI）
+├── apps/                           # 应用中心
+│   ├── README.md / README.en.md    # 应用目录（中/英）
+│   ├── LICENSE
+│   └── Ai-Code-Agent/              # AI 编码 agent 技能
+├── examples/                       # 应用示例
+│   ├── app-sample-py/              # Python 应用工程示例
+│   ├── app-sample-web-html/        # 纯 HTML 前端示例
+│   └── app-sample-web-vue/         # Vue 3 前端示例
+├── gmssh-app-skeleton-back-py/     # Python 后端骨架（开发规范）
+├── gmssh-app-skeleton-go/          # Go JSON-RPC 框架（simplejrpc-go）
+└── gmssh-front-sdk/                # 前端 SDK（npm: gm-app-sdk）
+```
+
 ## 生态仓库
 
 | 仓库 | 是什么 |
