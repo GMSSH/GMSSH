@@ -1,0 +1,80 @@
+:root[data-theme='dark'] {
+  /* 新版主题色-黑色主题 */
+/*主题色*/
+  --jm-theme: rgba(0,0,0,0.3);;
+
+  /*主色1*/
+  --jm-primary-1: #5772FF;
+  --jm-primary-2: #708BFF;
+  --jm-primary-3: #A8BDFF;
+  --jm-primary-4: #000000;
+
+  /*辅助色1*/
+  --jm-accent-1: #222222;
+  --jm-accent-2: #393939;
+  --jm-accent-3: #555555;
+  --jm-accent-4: #727272;
+  --jm-accent-5: #afafaf;
+  --jm-accent-6: #d2d2d2;
+  --jm-accent-7: #ffffff;
+
+  /*主题色*/
+  --jm-theme-rgb: 16, 16, 16;
+  /* 主色1 */
+  --jm-primary-1-rgb: 87, 114, 255; 
+  --jm-primary-2-rgb: 112, 139, 255; 
+  --jm-primary-3-rgb: 168, 189, 255; 
+  --jm-primary-4-rgb: 0, 0, 0; 
+
+   /* 辅助色2 */
+  --jm-accent-1-rgb: 34, 34, 34; 
+  --jm-accent-2-rgb: 57, 57, 57; 
+  --jm-accent-3-rgb: 85, 85, 85;
+  --jm-accent-4-rgb: 114, 114, 114;
+  --jm-accent-5-rgb: 175, 175, 175;
+  --jm-accent-6-rgb: 210, 210, 210;
+  --jm-accent-7-rgb: 255, 255, 255;
+
+ /*状态色*/
+  --jm-error-color: #f04d3c;
+  --jm-success-color: #3bad5b;
+  --jm-warning-color: #f4bf50;
+
+  /*字体*/
+  --jm-font-size-12: 12px;
+  --jm-font-size-14: 14px;
+  --jm-font-size-16: 16px;
+  --jm-font-size-18: 18px;
+
+  /* end */
+
+/*旧版*/
+  --jm-color-primary2: #ddd;
+  --jm-color-primary3: #000;
+  --jm-font-color: #333333;
+  --jm-border-color: #d9d9d9;
+  --jm-global-color: #27b2bc;
+  --jm-global-rgb-color: rgb(39, 178, 188, 0.2);
+/*弹窗背景主色*/
+  --jm-bg-color: #101010;
+  --jm-color-grey: #222222;
+  /*svg default color*/
+  --jm-svg-color-primary: #d6d8de;
+  --jm-svg-color1: #828897;
+
+/*folder*/
+
+  /*upload*/
+  --jm-upload-border-color: #f1f3f8;
+  --jm-upload-font-color: #222222;
+  --jm-upload-font-color2: #999;
+  --jm-upload-border-b-color: #f1f3f8;
+  --jm-upload-bg-color: #f1f3f8;
+
+ /*系统设置*/
+  --jm-system-menu-bg-color: var(--jm-bg-color);
+  --jm-system-hover-color: rgba(255,255,255,0.08);
+  --jm-system-border-color: #efeff5;
+  --jm-system-bg-color: #fbfbfb;
+  --jm-system-font-color: #666;
+}

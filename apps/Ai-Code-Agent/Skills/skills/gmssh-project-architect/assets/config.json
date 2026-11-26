@@ -1,0 +1,30 @@
+{
+  "test": {
+    "logger": {
+      "path": "logs/",
+      "file": "{Y-m-d}.log",
+      "level": "info",
+      "stdout": true,
+      "StStatus": 0,
+      "rotateBackupLimit": 7,
+      "writerColorEnable": true,
+      "RotateBackupCompress": 9,
+      "rotateExpire": "1d",
+      "Flag": 44
+    }
+  },
+  "prod": {
+    "logger": {
+      "path": "logs/",
+      "file": "{Y-m-d}.log",
+      "level": "error",
+      "stdout": false,
+      "StStatus": 0,
+      "rotateBackupLimit": 7,
+      "writerColorEnable": true,
+      "RotateBackupCompress": 9,
+      "rotateExpire": "1d",
+      "Flag": 44
+    }
+  }
+}
