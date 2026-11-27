@@ -329,3 +329,8 @@ GMSSH/
 | [GMClaw](https://github.com/GMSSH/GMClaw) | GMSSH 生态个人 AI 助手 |
 | [nginx-manager](https://github.com/GMSSH/nginx-manager) | Nginx 安装/配置/监控工具（Python + SimpleJRPC） |
 | [dock-speed-v8](https://github.com/GMSSH/dock-speed-v8) | 公益 Docker/GHCR 镜像加速站 |
+
+## 贡献者
+
+- **Claude**（Anthropic）—— AI 辅助开发与文档
+- [@tian-sigons](https://github.com/tian-sigons) —— 社区贡献者

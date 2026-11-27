@@ -340,3 +340,8 @@ GMSSH/
 | [GMClaw](https://github.com/GMSSH/GMClaw) | Personal AI assistant built on the GMSSH ecosystem |
 | [nginx-manager](https://github.com/GMSSH/nginx-manager) | Nginx install/config/monitor tool (Python + SimpleJRPC) |
 | [dock-speed-v8](https://github.com/GMSSH/dock-speed-v8) | Public Docker/GHCR mirror accelerator for Chinese developers |
+
+## Contributors
+
+- **Claude** (Anthropic) — AI-assisted development and documentation
+- [@tian-sigons](https://github.com/tian-sigons) — community contributor
