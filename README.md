@@ -12,7 +12,7 @@
 #### An SSH-based desktop workspace that makes Linux servers simple, secure, intelligent, and accessible.
 
 [![Chinese](https://img.shields.io/badge/Lang-%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87-brightgreen)](https://github.com/GMSSH/GMSSH/blob/main/README.cn.md)
-[![English](http://img.shields.io/badge/Lang-English-blue)](https://github.com/GMSSH/GMSSH/blob/main/README.md)
+[![English](https://img.shields.io/badge/Lang-English-blue)](https://github.com/GMSSH/GMSSH/blob/main/README.md)
 
 <p>
   <a href="#what-is-gmssh">Introduction</a> •
